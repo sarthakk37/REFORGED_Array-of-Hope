@@ -12,6 +12,7 @@ import {
   HealthResponse,
   TriggerDriftRequest,
   TriggerDriftResponse,
+  WebhookDriftRequest,
   ApproveResponse,
   ApiErrorDetail,
 } from './types';
@@ -113,7 +114,14 @@ export class HttpClient implements ApiClient {
   }
 
   async triggerDrift(request: TriggerDriftRequest): Promise<TriggerDriftResponse> {
-    return this.request<TriggerDriftResponse>('/api/demo/drift', {
+    return this.request<TriggerDriftResponse>('/api/runs/simulate', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async triggerWebhook(request: WebhookDriftRequest): Promise<TriggerDriftResponse> {
+    return this.request<TriggerDriftResponse>('/api/v1/webhooks/drift', {
       method: 'POST',
       body: JSON.stringify(request),
     });

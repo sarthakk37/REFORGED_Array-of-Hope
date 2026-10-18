@@ -9,6 +9,7 @@ import { useRunEvents } from '@/hooks/useRunEvents';
 import { useApprove } from '@/hooks/useApprove';
 import { useToast } from '@/components/ui/Toast';
 import { RemediationStage } from '@/components/runs/RemediationStage';
+import { RunSourceBadge } from '@/components/runs/RunSourceBadge';
 import { Spinner } from '@/components/ui/Spinner';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Button } from '@/components/ui/Button';
@@ -72,11 +73,12 @@ export const RunDetailPage: React.FC = () => {
 
         <div className="flex items-center justify-between pb-3 border-b border-forge-border">
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-xl font-bold text-white flex items-center gap-2 flex-wrap">
               <span>Remediation Run: {run.service_name}</span>
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-black/40 text-gray-300 border border-forge-border">
                 {run.id}
               </span>
+              <RunSourceBadge source={run.source} externalRef={run.external_ref} size="sm" />
             </h1>
             <p className="text-xs text-gray-400">
               Complete diagnosis, safe test room logs, and pull request preview

@@ -5,7 +5,7 @@ import React from 'react';
 import { cn } from '@/lib/classNames';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'amber' | 'cyan' | 'green' | 'red' | 'purple' | 'outline';
+  variant?: 'default' | 'amber' | 'cyan' | 'green' | 'red' | 'purple' | 'orange' | 'outline';
   size?: 'sm' | 'md';
   pulse?: boolean;
 }
@@ -30,6 +30,7 @@ export const Badge: React.FC<BadgeProps> = ({
     green: 'bg-forge-green/15 text-forge-green-light border border-forge-green/30',
     red: 'bg-forge-red/15 text-forge-red-light border border-forge-red/30',
     purple: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
+    orange: 'bg-orange-500/15 text-orange-400 border border-orange-500/30',
     outline: 'bg-transparent text-gray-300 border border-forge-border',
   }[variant];
 

@@ -12,6 +12,7 @@ import {
   HealthResponse,
   TriggerDriftRequest,
   TriggerDriftResponse,
+  WebhookDriftRequest,
   ApproveResponse,
 } from './types';
 import { MOCK_USERS, MOCK_PASSWORD } from '@/mock/users';
@@ -132,7 +133,8 @@ export class MockClient implements ApiClient {
       id: runId,
       scenario,
       service_name: service_name || 'Payment app',
-      source: 'manual',
+      source: request.source || 'manual',
+      external_ref: request.external_ref || null,
       status: 'running',
       confidence: isMemoryHealed ? 0.99 : scenarioData.driftReport.changes[0]?.confidence || 0.96,
       verified: true,
@@ -167,12 +169,20 @@ export class MockClient implements ApiClient {
       if (isMemoryHealed) {
         mockStore.incrementPatternUsage(scenarioData.driftReport.fingerprint);
       } else if (scenario === 'type') {
-        // First fix completed: Add to remembered fixes!
         mockStore.addRememberedFix('type');
       }
     }, streamDurationMs);
 
     return { run_id: runId };
+  }
+
+  async triggerWebhook(request: WebhookDriftRequest): Promise<TriggerDriftResponse> {
+    return this.triggerDrift({
+      scenario: request.scenario,
+      service_name: request.service_name,
+      source: request.source || 'n8n',
+      external_ref: request.external_ref || `workflow-drift-heal-${Math.floor(100 + Math.random() * 900)}`,
+    });
   }
 
   async getHealth(): Promise<HealthResponse> {

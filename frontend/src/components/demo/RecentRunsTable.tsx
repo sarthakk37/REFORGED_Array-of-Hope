@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Zap } from 'lucide-react';
 import { Run } from '@/api/types';
 import { Badge } from '@/components/ui/Badge';
+import { RunSourceBadge } from '@/components/runs/RunSourceBadge';
 import { formatRelativeTime } from '@/lib/formatDate';
 import { DRIFT_SCENARIOS } from '@/mock/drifts';
 
@@ -61,7 +62,12 @@ export const RecentRunsTable: React.FC<RecentRunsTableProps> = ({
                   <td className="py-3 px-3 text-white font-sans font-semibold group-hover:text-forge-amber-light">
                     {sc?.title || r.scenario}
                   </td>
-                  <td className="py-3 px-3 text-gray-300 font-sans">{r.service_name}</td>
+                  <td className="py-3 px-3 text-gray-300 font-sans">
+                    <div className="flex flex-col gap-1 items-start">
+                      <span>{r.service_name}</span>
+                      <RunSourceBadge source={r.source} externalRef={r.external_ref} size="sm" />
+                    </div>
+                  </td>
                   <td className="py-3 px-3 text-gray-300">
                     {r.healed_from_memory ? (
                       <span className="text-purple-300 font-semibold flex items-center gap-1">

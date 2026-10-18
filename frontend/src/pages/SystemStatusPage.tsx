@@ -5,6 +5,7 @@ import React from 'react';
 import { Activity, ShieldCheck, RefreshCw, Cpu, Lock, AlertTriangle } from 'lucide-react';
 import { useHealth } from '@/hooks/useHealth';
 import { IntegrationStatusCard } from '@/components/system/IntegrationStatusCard';
+import { N8nWebhookCard } from '@/components/system/N8nWebhookCard';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -118,6 +119,9 @@ export const SystemStatusPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* n8n Webhook Ingestion */}
+      <N8nWebhookCard />
 
       {/* Integration Grid */}
       <div className="space-y-4">

@@ -1,20 +1,18 @@
 // Full history log page listing all past API change remediation runs.
-// Clicking a run opens the complete RemediationStage reusing stage components.
+// Composes HistoryTable and RemediationStage for deep inspection of past runs.
 
 import React, { useState } from 'react';
-import { History, ArrowLeft, RefreshCw, Zap } from 'lucide-react';
+import { History, ArrowLeft, RefreshCw } from 'lucide-react';
 import { useRuns } from '@/hooks/useRuns';
 import { useRun } from '@/hooks/useRun';
 import { useRunEvents } from '@/hooks/useRunEvents';
 import { useApprove } from '@/hooks/useApprove';
 import { useToast } from '@/components/ui/Toast';
 import { RemediationStage } from '@/components/runs/RemediationStage';
+import { HistoryTable } from '@/components/runs/HistoryTable';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Spinner } from '@/components/ui/Spinner';
-import { formatRelativeTime } from '@/lib/formatDate';
-import { DRIFT_SCENARIOS } from '@/mock/drifts';
 
 export const HistoryPage: React.FC = () => {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
@@ -129,80 +127,11 @@ export const HistoryPage: React.FC = () => {
           </div>
         </CardHeader>
 
-        <div className="overflow-x-auto">
-          {isLoading ? (
-            <div className="p-12 flex flex-col items-center justify-center gap-3">
-              <Spinner size="lg" variant="amber" />
-              <span className="text-xs font-mono text-gray-400">Loading history...</span>
-            </div>
-          ) : (
-            <table className="w-full text-left text-xs font-sans">
-              <thead>
-                <tr className="bg-forge-bg/60 border-b border-forge-border text-gray-400 font-mono text-[11px] uppercase">
-                  <th className="py-3 px-6 font-semibold">Run ID</th>
-                  <th className="py-3 px-6 font-semibold">When</th>
-                  <th className="py-3 px-6 font-semibold">What Changed</th>
-                  <th className="py-3 px-6 font-semibold">App Affected</th>
-                  <th className="py-3 px-6 font-semibold">Repair Result</th>
-                  <th className="py-3 px-6 font-semibold text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-forge-border/40 font-mono">
-                {runs.map((r) => {
-                  const sc = DRIFT_SCENARIOS[r.scenario];
-                  return (
-                    <tr
-                      key={r.id}
-                      onClick={() => setSelectedRunId(r.id)}
-                      className="hover:bg-forge-surface-elevated/70 transition-colors cursor-pointer group"
-                    >
-                      <td className="py-3.5 px-6 font-bold text-forge-amber-light group-hover:underline">
-                        {r.id}
-                      </td>
-                      <td className="py-3.5 px-6 text-gray-400 whitespace-nowrap">
-                        {formatRelativeTime(r.started_at)}
-                      </td>
-                      <td className="py-3.5 px-6 text-white font-sans font-semibold">
-                        {sc?.title || r.scenario}
-                      </td>
-                      <td className="py-3.5 px-6 text-gray-300 font-sans">{r.service_name}</td>
-                      <td className="py-3.5 px-6 text-gray-300">
-                        {r.healed_from_memory ? (
-                          <span className="text-purple-300 font-semibold flex items-center gap-1">
-                            <Zap className="w-3.5 h-3.5 text-forge-amber" />
-                            Instant memory fix (0 AI calls)
-                          </span>
-                        ) : (
-                          <span>Fixed in ~22s ({r.llm_calls} AI calls)</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-6 text-right">
-                        <Badge
-                          variant={
-                            r.status === 'approved'
-                              ? 'green'
-                              : r.status === 'awaiting_approval'
-                              ? 'amber'
-                              : r.status === 'failed'
-                              ? 'red'
-                              : 'cyan'
-                          }
-                          size="sm"
-                        >
-                          {r.status === 'awaiting_approval'
-                            ? 'Ready for approval'
-                            : r.status === 'approved'
-                            ? 'Approved'
-                            : r.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+        <HistoryTable
+          runs={runs}
+          isLoading={isLoading}
+          onSelectRun={(id) => setSelectedRunId(id)}
+        />
       </Card>
     </div>
   );

@@ -31,11 +31,14 @@ export type RunStatus =
 
 export type Scenario = 'rename' | 'type' | 'nested';
 
+export type RunSource = 'manual' | 'webhook' | 'ci' | 'n8n';
+
 export interface Run {
   id: string;
   scenario: Scenario;
   service_name: string;
-  source: 'manual' | 'webhook' | 'ci';
+  source: RunSource;
+  external_ref?: string | null;
   status: RunStatus;
   confidence: number | null; // 0..1
   verified: boolean;
@@ -144,6 +147,16 @@ export interface HealthResponse {
 export interface TriggerDriftRequest {
   scenario: Scenario;
   service_name: string;
+  source?: RunSource;
+  external_ref?: string | null;
+}
+
+export interface WebhookDriftRequest {
+  scenario: Scenario;
+  service_name: string;
+  source?: RunSource;
+  external_ref?: string | null;
+  payload?: Record<string, unknown>;
 }
 
 export interface TriggerDriftResponse {

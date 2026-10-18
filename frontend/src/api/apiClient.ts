@@ -11,6 +11,7 @@ import {
   HealthResponse,
   TriggerDriftRequest,
   TriggerDriftResponse,
+  WebhookDriftRequest,
   ApproveResponse,
 } from './types';
 
@@ -22,5 +23,6 @@ export interface ApiClient {
   approveRun(id: string): Promise<ApproveResponse>;
   getPatterns(): Promise<LearnedPattern[]>;
   triggerDrift(request: TriggerDriftRequest): Promise<TriggerDriftResponse>;
+  triggerWebhook(request: WebhookDriftRequest): Promise<TriggerDriftResponse>;
   getHealth(): Promise<HealthResponse>;
 }

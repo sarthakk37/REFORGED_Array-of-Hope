@@ -10,11 +10,11 @@ export function useRuns() {
     queryKey: ['runs'],
     queryFn: () => api.getRuns(),
     refetchInterval: (query) => {
-      // Auto-poll every 3 seconds if any run is currently running or queued
+      // Auto-poll every ~4s if any run is currently running or queued, back to ~15s when idle
       const hasActiveRun = query.state.data?.some(
         (r) => r.status === 'running' || r.status === 'queued'
       );
-      return hasActiveRun ? 3000 : 15000;
+      return hasActiveRun ? 4000 : 15000;
     },
   });
 }

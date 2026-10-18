@@ -80,3 +80,13 @@ This document tracks technical decisions made during the development of DriftSmi
   2. Implement `usePresenterNarration` and `usePresenterDriver` to drive the demo: steps advance only after narration finishes (or audio duration elapses), visuals trigger at defined checkpoints, and narrator audio controls (voice selector, volume, mute, speed toggle) are embedded in `PresenterOverlay`.
   3. Support `VITE_NARRATION=speech|audio|off` via environment config with automatic graceful fallback when Web Speech is unsupported or audio files are missing.
 
+### DEC-014: n8n Workflow Ingestion Readiness & Webhook Architecture (Phase 3)
+- **Context:** DriftSmith will connect to upstream n8n workflows for ingesting failing API payloads and orchestrating human-in-the-loop approvals via Slack.
+- **Decision:**
+  1. Extend `RunSource` to include `'n8n'` alongside `'manual'`, `'webhook'`, and `'ci'`. Add optional `external_ref` to `Run` for tracking n8n execution IDs or Slack thread IDs.
+  2. Implement `RunSourceBadge` highlighting n8n runs with an orange badge and reference pill across `RecentRunsTable`, `HistoryTable`, and `RunDetailPage`.
+  3. Update `useRuns` with adaptive polling: 4s intervals during active remediation runs (`running` or `queued`), relaxing to 15s when idle.
+  4. Create `N8nWebhookCard` on `SystemStatusPage` detailing the webhook endpoint (`POST /api/v1/webhooks/drift`), auth header (`X-DriftSmith-Key: <key>`), and a ready-to-copy curl snippet. In mock mode, provide a one-click "Send test webhook" button that initiates an in-memory n8n run.
+  5. Author `docs/API_CONTRACT.md` detailing the complete REST and SSE contract between frontend and backend.
+  6. Add unit and integration tests in `src/test/n8n.test.tsx` verifying badge styling, external_ref display, auto-refresh polling, and webhook delivery.
+
