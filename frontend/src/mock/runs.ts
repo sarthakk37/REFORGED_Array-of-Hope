@@ -1,0 +1,106 @@
+// Fixtures for pre-seeded historical runs with full RunDetail representations.
+// Provides realistic state across verified, awaiting_approval, approved, and failed runs.
+
+import { RunDetail } from '@/api/types';
+import { DRIFT_SCENARIOS } from './drifts';
+
+const now = Date.now();
+
+export const INITIAL_MOCK_RUNS: RunDetail[] = [
+  {
+    id: 'run-101',
+    scenario: 'rename',
+    service_name: 'payment-gateway',
+    source: 'webhook',
+    status: 'awaiting_approval',
+    confidence: 0.98,
+    verified: true,
+    healed_from_memory: false,
+    llm_calls: 3,
+    iterations: 1,
+    started_at: new Date(now - 1000 * 60 * 18).toISOString(),
+    finished_at: new Date(now - 1000 * 60 * 17).toISOString(),
+    drift_report: DRIFT_SCENARIOS.rename.driftReport,
+    patch: DRIFT_SCENARIOS.rename.patch,
+    pull_request: {
+      url: null,
+      branch: 'fix/drift-amount-in-cents-rename',
+      status: 'dry_run',
+      dry_run: true,
+    },
+  },
+  {
+    id: 'run-102',
+    scenario: 'type',
+    service_name: 'billing-service',
+    source: 'ci',
+    status: 'approved',
+    confidence: 0.96,
+    verified: true,
+    healed_from_memory: false,
+    llm_calls: 4,
+    iterations: 2,
+    started_at: new Date(now - 1000 * 60 * 95).toISOString(),
+    finished_at: new Date(now - 1000 * 60 * 94).toISOString(),
+    drift_report: DRIFT_SCENARIOS.type.driftReport,
+    patch: DRIFT_SCENARIOS.type.patch,
+    pull_request: {
+      url: 'https://github.com/org/payments-core/pull/482',
+      branch: 'fix/drift-amount-type-coercion',
+      status: 'open',
+      dry_run: false,
+    },
+  },
+  {
+    id: 'run-103',
+    scenario: 'nested',
+    service_name: 'checkout-api',
+    source: 'manual',
+    status: 'verified',
+    confidence: 0.94,
+    verified: true,
+    healed_from_memory: true,
+    llm_calls: 0,
+    iterations: 1,
+    started_at: new Date(now - 1000 * 60 * 60 * 14).toISOString(),
+    finished_at: new Date(now - 1000 * 60 * 60 * 14 + 5000).toISOString(),
+    drift_report: DRIFT_SCENARIOS.nested.driftReport,
+    patch: DRIFT_SCENARIOS.nested.patch,
+    pull_request: {
+      url: null,
+      branch: 'fix/drift-nested-customer-path',
+      status: 'dry_run',
+      dry_run: true,
+    },
+  },
+  {
+    id: 'run-104',
+    scenario: 'rename',
+    service_name: 'legacy-listener',
+    source: 'webhook',
+    status: 'failed',
+    confidence: 0.42,
+    verified: false,
+    healed_from_memory: false,
+    llm_calls: 2,
+    iterations: 3,
+    started_at: new Date(now - 1000 * 60 * 60 * 36).toISOString(),
+    finished_at: new Date(now - 1000 * 60 * 60 * 36 + 25000).toISOString(),
+    drift_report: {
+      fingerprint: 'fp_unresolved_legacy_drift_0x1',
+      summary: 'Ambiguous schema changes detected across multiple undocumented nested keys.',
+      risk: 'high',
+      changes: [
+        {
+          type: 'removed',
+          path: 'metadata.internal_trace_key',
+          from: 'metadata.internal_trace_key',
+          to: null,
+          confidence: 0.42,
+        },
+      ],
+    },
+    patch: null,
+    pull_request: null,
+  },
+];
