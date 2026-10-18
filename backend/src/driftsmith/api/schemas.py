@@ -110,6 +110,8 @@ class DriftReportSchema(BaseModel):
 class TestCaseResultSchema(BaseModel):
     """Individual contract or unit test result in sandbox."""
 
+    __test__ = False
+
     name: str
     payload_version: Literal["old", "new"]
     passed: bool
