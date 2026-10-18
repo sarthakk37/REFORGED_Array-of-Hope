@@ -32,7 +32,7 @@ Authenticates a user and issues a JWT bearer token.
 - **Request Body:**
   ```json
   {
-    "email": "priya@example.com",
+    "email": "approver@example.com",
     "password": "password"
   }
   ```
@@ -43,7 +43,7 @@ Authenticates a user and issues a JWT bearer token.
     "token_type": "bearer",
     "user": {
       "id": "usr-1",
-      "email": "priya@example.com",
+      "email": "approver@example.com",
       "role": "approver"
     }
   }
@@ -58,7 +58,7 @@ Fetches the currently authenticated user's profile.
   ```json
   {
     "id": "usr-1",
-    "email": "priya@example.com",
+    "email": "approver@example.com",
     "role": "approver"
   }
   ```

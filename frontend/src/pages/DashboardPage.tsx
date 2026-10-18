@@ -1,5 +1,5 @@
 // The Live Demo Stage (Home Page) for DriftSmith.
-// Coordinates simulator controls, real-time remediation stage, and synchronized voice walkthrough.
+// Coordinates simulator controls, real-time remediation stage, and recent verified fixes.
 
 import React, { useState, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
@@ -11,9 +11,7 @@ import { useTriggerDrift } from '@/hooks/useTriggerDrift';
 import { useApprove } from '@/hooks/useApprove';
 import { usePatterns } from '@/hooks/usePatterns';
 import { useToast } from '@/components/ui/Toast';
-import { usePresenterDriver } from '@/hooks/usePresenterDriver';
 import { RemediationStage } from '@/components/runs/RemediationStage';
-import { PresenterOverlay } from '@/components/demo/PresenterOverlay';
 import { SimulatorHeader } from '@/components/demo/SimulatorHeader';
 import { SimulatorControls, AppTarget } from '@/components/demo/SimulatorControls';
 import { RecentRunsTable } from '@/components/demo/RecentRunsTable';
@@ -87,20 +85,11 @@ export const DashboardPage: React.FC = () => {
     }
   }, [activeRunId, approveMutation, toast, refetchActiveRun, refetchRuns]);
 
-  // Hook driving automated presenter walkthrough and spoken narration
-  const presenter = usePresenterDriver({
-    activeRunId,
-    onSimulate: handleSimulate,
-    onApprove: handleApprove,
-    onSelectScenario: setSelectedScenario,
-    onSelectApp: setSelectedApp,
-  });
-
   const recentRuns = runs.slice(0, 5);
 
   return (
     <div className="max-w-[1100px] mx-auto space-y-10 py-2">
-      <SimulatorHeader onStartGuidedDemo={presenter.startGuidedDemo} />
+      <SimulatorHeader />
 
       <SimulatorControls
         selectedScenario={selectedScenario}
@@ -154,26 +143,6 @@ export const DashboardPage: React.FC = () => {
       )}
 
       <RecentRunsTable runs={recentRuns} onSelectRun={setActiveRunId} />
-
-      {presenter.isPresenterMode && (
-        <PresenterOverlay
-          currentStepIndex={presenter.presenterStepIndex}
-          isPlaying={presenter.isPlaying}
-          speed={presenter.speed}
-          isMuted={presenter.narration.isMuted}
-          volume={presenter.narration.volume}
-          availableVoices={presenter.narration.availableVoices}
-          selectedVoice={presenter.narration.selectedVoice}
-          onTogglePlay={presenter.handleTogglePlay}
-          onNext={presenter.handleNextStep}
-          onPrev={presenter.handlePrevStep}
-          onToggleSpeed={() => presenter.setSpeed((prev) => (prev === 1 ? 2 : 1))}
-          onToggleMute={() => presenter.narration.setMuted(!presenter.narration.isMuted)}
-          onVolumeChange={presenter.narration.setVolume}
-          onVoiceChange={presenter.narration.setVoice}
-          onExit={presenter.handleExitDemo}
-        />
-      )}
     </div>
   );
 };

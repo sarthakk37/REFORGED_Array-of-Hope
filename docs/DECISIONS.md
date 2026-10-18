@@ -53,10 +53,6 @@ This document tracks technical decisions made during the development of DriftSmi
 - **Context:** Requiring users to jump back and forth between dashboard tables and detail pages disrupted the live demo experience.
 - **Decision:** Introduce `RemediationStage.tsx` directly on the Home Page (`DashboardPage.tsx`). Choosing an API change immediately reveals the live stage on the same screen without page navigation, while keeping full detail views reusable on `/history` and `/runs/:id`.
 
-### DEC-009: Automated Hands-Free Presenter Mode Walkthrough
-- **Context:** Live hackathon pitches require seamless, timed demonstrations without manual clicking.
-- **Decision:** Build `PresenterOverlay.tsx` with high-contrast 20px+ subtitle captions, auto-playing the narrative across both the fresh repair loop (with the Reviewer retry) and the instant memory healing demo, complete with play/pause, step skipping, and 1x/2x speed controls.
-
 ### DEC-010: Zero-Network Mock Pull Request Previews and Double-Submit Guard
 - **Context:** In mock mode, clicking Approve previously risked broken GitHub URLs or network errors.
 - **Decision:** In mock mode, approval never invokes the network or GitHub. It renders an inline "Pull request preview" card with branch `driftsmith/fix-<id>`, copyable description, and clear preview label. Disable buttons during inflight requests to prevent double submits.
@@ -70,15 +66,8 @@ This document tracks technical decisions made during the development of DriftSmi
 - **Decision:**
   1. Detect and remove dead components (`AgentTimeline`, `ApprovalBar`, `DiffViewer`, `DriftReportCard`, `LearnedPatternsPage`, `Tabs`, `formatDuration`, etc.) using `knip`.
   2. Enforce a strict 200-line ceiling per file with one component per file by splitting monolithic modules (`DashboardPage` into `SimulatorHeader`, `SimulatorControls`, `RecentRunsTable`; `ApprovalPanel` into `PullRequestPreviewCard`, `ApprovalConfirmModal`; mock scenarios and events into individual typed files).
-  3. Add comprehensive smoke test coverage (`src/test/smoke.test.tsx`) asserting all 5 primary flows (login, simulation trigger, detail inspection, approval & PR preview, presenter mode).
+  3. Add comprehensive smoke test coverage (`src/test/smoke.test.tsx`) asserting all primary flows (login, simulation trigger, detail inspection, approval & PR preview, manual controls).
   4. Enforce ESLint rules (`no-console` with error/warn allowance, `max-lines` 200, strict type safety) and add unified `npm run check`.
-
-### DEC-013: Spoken Voice Narration with Visual Presenter Sync (Phase 2)
-- **Context:** Presenter mode previously relied only on subtitle captions. Spoken narration elevates hackathon demos while ensuring visual state stays strictly synchronized with audio playback.
-- **Decision:**
-  1. Create a `VoiceNarrator` interface (`speak`, `cancel`, `pause`, `resume`, `isAvailable`, `setVolume`, `setVoice`, `getAvailableVoices`) with three implementations: `SpeechSynthesisNarrator` (browser Web Speech API, defaulting to Indian English / Priya persona or natural voice), `AudioFileNarrator` (playing pre-recorded `/narration/<stepId>.mp3` with fallback), and `SilentNarrator` (cadence timing at 375ms/word).
-  2. Implement `usePresenterNarration` and `usePresenterDriver` to drive the demo: steps advance only after narration finishes (or audio duration elapses), visuals trigger at defined checkpoints, and narrator audio controls (voice selector, volume, mute, speed toggle) are embedded in `PresenterOverlay`.
-  3. Support `VITE_NARRATION=speech|audio|off` via environment config with automatic graceful fallback when Web Speech is unsupported or audio files are missing.
 
 ### DEC-014: n8n Workflow Ingestion Readiness & Webhook Architecture (Phase 3)
 - **Context:** DriftSmith will connect to upstream n8n workflows for ingesting failing API payloads and orchestrating human-in-the-loop approvals via Slack.

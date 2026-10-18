@@ -3,7 +3,7 @@
 // 2. Trigger drift simulation
 // 3. View run details
 // 4. Approve fix & open PR
-// 5. Start guided demo (Presenter mode)
+// 5. Dashboard clean headline and manual controls render
 
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -164,7 +164,7 @@ describe('DriftSmith Smoke Tests', () => {
     });
   });
 
-  it('Flow 5: Guided demo start launches presenter mode', async () => {
+  it('Flow 5: Dashboard renders clean value proposition headline and manual simulator controls', async () => {
     vi.spyOn(api, 'getRuns').mockResolvedValue([]);
     vi.spyOn(api, 'getPatterns').mockResolvedValue([]);
     vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
@@ -175,13 +175,12 @@ describe('DriftSmith Smoke Tests', () => {
       authEnabled: true,
     });
 
-    const { getByTestId, findByTestId } = renderWithProviders(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
 
-    const startDemoBtn = getByTestId('start-guided-demo-btn');
-    fireEvent.click(startDemoBtn);
-
-    const overlay = await findByTestId('presenter-overlay');
-    expect(overlay).toBeInTheDocument();
-    expect(screen.getByText(/presenter mode/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/When a company's API changes without warning/i)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /simulate api change/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('start-guided-demo-btn')).not.toBeInTheDocument();
   });
 });
