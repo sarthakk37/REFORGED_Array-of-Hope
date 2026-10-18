@@ -100,3 +100,8 @@ This document tracks technical decisions made during the development of DriftSmi
 - **Context:** Self-healing patches must only modify designated source files of target services and be verified against both old and new payload contracts without risking path traversal.
 - **Decision:** Implement `TargetRegistry` conforming to `DEMO_TARGET_CONTRACT.md`. Source modifications are bounded by `service.toml` allowlists. Sandbox runs isolate execution inside ephemeral subprocess or container environments.
 
+### DEC-019: Target Contract Baseline Payload Fixture Alignment
+- **Context:** `docs/DEMO_TARGET_CONTRACT.md` Section 2 referenced `provider_payload_file = "fixtures/payloads/current.json"` in its example `service.toml`, whereas Section 1 directory structure and the actual backend implementation (`target_registry.py` default and `tests/sample_target/service.toml`) define the baseline golden fixture as `fixtures/payloads/v1.json`.
+- **Decision:** Align the contract documentation to reference `fixtures/payloads/v1.json` as `provider_payload_file`, matching `sample_target` and target registry expectations.
+
+

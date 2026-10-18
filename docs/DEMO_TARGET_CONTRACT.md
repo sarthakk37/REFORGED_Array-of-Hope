@@ -33,7 +33,7 @@ name = "payment-gateway"
 language = "python"
 source_files = ["service.py"]
 test_command = "pytest tests"
-provider_payload_file = "fixtures/payloads/current.json"
+provider_payload_file = "fixtures/payloads/v1.json"
 ```
 
 ### Schema
