@@ -1,17 +1,10 @@
 """Integration tests for runs, approval RBAC, and CORS."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 from driftsmith.config import settings
 from driftsmith.db.repositories import runs as runs_repo
 from driftsmith.db.session import SessionLocal
-from seeds.seed_demo_users import seed
-
-
-@pytest.fixture(autouse=True)
-def setup_db() -> None:
-    seed()
 
 
 def _get_token(client: TestClient, email: str) -> str:

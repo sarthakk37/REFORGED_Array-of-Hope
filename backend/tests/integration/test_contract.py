@@ -1,6 +1,5 @@
 """Contract test strictly validating API responses against docs/API_CONTRACT.md schemas."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 from driftsmith.config import settings
@@ -11,12 +10,6 @@ from driftsmith.db.repositories import (
     runs as runs_repo,
 )
 from driftsmith.db.session import SessionLocal
-from seeds.seed_demo_users import seed
-
-
-@pytest.fixture(autouse=True)
-def setup_contract_data() -> None:
-    seed()
 
 
 def _login(client: TestClient) -> dict:
