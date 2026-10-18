@@ -1,0 +1,12 @@
+{
+  "id": "pay_9F2kL1",
+  "event": "payment.captured",
+  "currency": "INR",
+  "status": "captured",
+  "amount": "499.00",
+  "created_at": "2026-10-18T10:15:00Z",
+  "customer": {
+    "name": "Asha Verma",
+    "email": "asha@example.com"
+  }
+}
