@@ -1,0 +1,62 @@
+/* DriftSmith Global Styles and Forge Design Tokens */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forge-bg: #0b0f17;
+  --color-forge-surface: #111827;
+  --color-forge-surface-elevated: #162234;
+  --color-forge-border: #1f2a3e;
+  --color-forge-amber: #f59e0b;
+  --color-forge-cyan: #06b6d4;
+  --color-forge-green: #10b981;
+  --color-forge-red: #ef4444;
+}
+
+body {
+  background-color: #0b0f17;
+  color: #f3f4f6;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for dark technical look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b0f17;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2a3e;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Shimmer effect for active agent thoughts */
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(245, 158, 11, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
