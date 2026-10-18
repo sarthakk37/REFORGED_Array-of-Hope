@@ -1,0 +1,9 @@
+{
+  "id": "evt_1004",
+  "amount_in_cents": 49900,
+  "payer": {
+    "contact": {
+      "email": "alex@example.com"
+    }
+  }
+}

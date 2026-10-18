@@ -1,0 +1,7 @@
+{
+  "id": "evt_1003",
+  "amount": "499.00",
+  "customer": {
+    "email": "alex@example.com"
+  }
+}

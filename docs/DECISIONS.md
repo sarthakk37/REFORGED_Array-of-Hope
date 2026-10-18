@@ -79,3 +79,24 @@ This document tracks technical decisions made during the development of DriftSmi
   5. Author `docs/API_CONTRACT.md` detailing the complete REST and SSE contract between frontend and backend.
   6. Add unit and integration tests in `src/test/n8n.test.tsx` verifying badge styling, external_ref display, auto-refresh polling, and webhook delivery.
 
+### DEC-015: Strict Layer Boundary and Pydantic DTO Separation
+- **Context:** To ensure long-term maintainability, the backend must prevent circular dependencies, leaky abstractions, and raw untyped dictionaries crossing architectural layers.
+- **Decision:**
+  1. Strict one-way dependency graph: `api -> services -> (core, ai, integrations, db)`.
+  2. Core contains zero DB or network imports; pure deterministic logic.
+  3. AI contains all LLM prompts and agent wrappers; no LLM imports elsewhere.
+  4. Every layer boundary exchanges strongly typed Pydantic models with complete type annotations.
+  5. Error responses strictly conform to `{ "detail": string }`.
+
+### DEC-016: Dual Route Registration for Exact Contract and Client Compatibility
+- **Context:** `docs/API_CONTRACT.md` describes paths such as `/runs/:id/events` and `/api/runs/:id/stream`, as well as `/api/demo/drift` vs `/api/runs/simulate`.
+- **Decision:** FastAPI router includes canonical paths and exact aliases for both `/api/...` and un-prefixed versions where needed, ensuring zero friction whether called by tests, curl, or the Vite dev server.
+
+### DEC-017: Offline-First LLM Architecture via Replay Cache and Mock Engine
+- **Context:** Evaluators and CI pipelines must be able to run the complete heal cycle offline from a clean clone without requiring valid external API keys.
+- **Decision:** Support `LLM_MODE=mock|replay|live`. Live mode calls Google Gemma through the Gemini API and records hashed prompt/response pairs to `backend/fixtures/llm_replay/`. Replay mode reproduces identical responses deterministically. Mock mode provides scripted realistic agent behaviors including a planned critic feedback retry on type coercion.
+
+### DEC-018: Target Registry & Sandbox Security Isolation
+- **Context:** Self-healing patches must only modify designated source files of target services and be verified against both old and new payload contracts without risking path traversal.
+- **Decision:** Implement `TargetRegistry` conforming to `DEMO_TARGET_CONTRACT.md`. Source modifications are bounded by `service.toml` allowlists. Sandbox runs isolate execution inside ephemeral subprocess or container environments.
+
