@@ -1,0 +1,6 @@
+{
+  "summary": "Provider renamed 'amount_in_cents' to 'total_amount'. Consumer code expecting amount_in_cents fails with KeyError.",
+  "confidence": 0.98,
+  "risk": "medium",
+  "affected_fields": ["amount_in_cents"]
+}

@@ -1,0 +1,12 @@
+{
+  "scenario": "nested",
+  "summary": "Support customer.email with fallback to payer.contact.email.",
+  "target_file": "service.py",
+  "actions": [
+    {
+      "action_type": "remap_path",
+      "target_path": "customer.email",
+      "source_path": "payer.contact.email"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "scenario": "rename",
+  "summary": "Fallback to total_amount if amount_in_cents is missing to maintain backward compatibility.",
+  "target_file": "service.py",
+  "actions": [
+    {
+      "action_type": "rename_key",
+      "target_path": "amount_in_cents",
+      "source_path": "total_amount"
+    }
+  ]
+}

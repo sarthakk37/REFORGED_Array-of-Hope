@@ -1,0 +1,6 @@
+{
+  "summary": "Provider relocated customer email from 'customer.email' to 'payer.contact.email'.",
+  "confidence": 0.99,
+  "risk": "medium",
+  "affected_fields": ["customer.email"]
+}

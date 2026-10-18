@@ -1,0 +1,6 @@
+{
+  "summary": "Provider modified 'amount_in_cents' (integer in paise) to 'amount' (decimal string in rupees, e.g. '499.00').",
+  "confidence": 0.95,
+  "risk": "high",
+  "affected_fields": ["amount_in_cents"]
+}

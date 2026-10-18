@@ -1,0 +1,5 @@
+{
+  "diagnosis": "The verification test failed because amount '499.00' represents rupees, but the service expects amount_in_cents (49900 paise). With scale_factor 1.0, the resulting amount was 499 instead of 49900.",
+  "suggested_fix": "Set scale_factor to 100.0 on CoerceTypeAction to accurately convert rupees to paise (int(round(float(amount) * 100))).",
+  "should_retry": true
+}

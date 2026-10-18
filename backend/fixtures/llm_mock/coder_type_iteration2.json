@@ -1,0 +1,14 @@
+{
+  "scenario": "type",
+  "summary": "Coerce amount string from rupees to paise with 100x rescaling factor.",
+  "target_file": "service.py",
+  "actions": [
+    {
+      "action_type": "coerce_type",
+      "target_path": "amount_in_cents",
+      "source_path": "amount",
+      "target_type": "int",
+      "scale_factor": 100.0
+    }
+  ]
+}
