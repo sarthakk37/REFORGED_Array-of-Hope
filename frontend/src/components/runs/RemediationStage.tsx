@@ -53,7 +53,7 @@ export const RemediationStage: React.FC<RemediationStageProps> = ({
   }
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div data-testid="remediation-stage" className="space-y-6 animate-fadeIn">
       {/* 5-Step Narrative Progress Bar */}
       <StoryProgress
         currentStep={currentStep}

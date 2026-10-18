@@ -116,8 +116,44 @@ frontend/src/
 │   ├── LoginPage.tsx       # Authentication login page
 │   └── NotFoundPage.tsx    # 404 fallback page
 ├── styles/                 # Global styles and Tailwind configuration
-└── test/                   # Vitest unit and smoke test suites
+├── test/                   # Vitest unit and smoke test suites
+└── voice/                  # Voice narration engine
+    ├── narrator.ts         # VoiceNarrator interface contract
+    ├── speechSynthesisNarrator.ts # Browser Web Speech API synthesizer
+    ├── audioFileNarrator.ts# Recorded MP3 audio player with fallback
+    ├── silentNarrator.ts   # Cadence-based word-count silent timer
+    └── index.ts            # Factory selecting narrator from VITE_NARRATION
 ```
+
+---
+
+## Voice Narration & Guided Demo Walkthrough
+
+The guided demo presents Priya's payment app story with live spoken voice narration synchronized with visual cues:
+
+1. **How It Works**:
+   - Spoken audio and visual animations advance in strict synchronization.
+   - The stage does not advance to the next step until the current step's voice narration finishes speaking (or the silent duration elapses).
+   - If playback speed is toggled to 2x, speech rate increases to 1.5x.
+   - Pausing stops both speech and visual timers; Next/Prev cancels current speech and plays the new step immediately.
+   - During each step, relevant UI cards (simulator card, before/after payload, diff viewer, safe test results, PR preview) are smoothly highlighted.
+
+2. **Narration Modes (`VITE_NARRATION`)**:
+   - `speech` (Default): Uses the browser's Web Speech API (`SpeechSynthesis`). Auto-selects an Indian-accented English voice (`en-IN`) or natural-sounding system voice, with persistent voice selection, volume slider, and mute toggles on the overlay.
+   - `audio`: Plays pre-recorded MP3 voice tracks from `/public/narration/<stepId>.mp3`. If an MP3 is missing, it falls back seamlessly to word-cadence timing without errors.
+   - `off`: Disables audio completely and advances steps based on word-count reading cadence (~160 wpm).
+
+3. **Using Custom Audio Tracks**:
+   To drop in custom voiceovers, place MP3 files into `frontend/public/narration/` matching each step ID:
+   - `intro-priya.mp3`
+   - `api-break-triggered.mp3`
+   - `drift-diagnosed.mp3`
+   - `code-written-review.mp3`
+   - `safe-test-passed.mp3`
+   - `human-approval-pr.mp3`
+   - `memory-heal-second-app.mp3`
+   - `summary-comparison.mp3`
+   Set `VITE_NARRATION=audio` in `.env`.
 
 ---
 

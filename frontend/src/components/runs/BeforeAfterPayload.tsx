@@ -18,7 +18,7 @@ export const BeforeAfterPayload: React.FC<BeforeAfterPayloadProps> = ({
   newPayloadJson,
 }) => {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden" data-testid="before-after-payload">
       <CardHeader className="py-3 px-5 bg-forge-surface-elevated/40">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-forge-amber" />

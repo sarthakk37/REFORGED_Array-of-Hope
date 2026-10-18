@@ -26,7 +26,7 @@ export const FixDiff: React.FC<FixDiffProps> = ({ patch, plainCaption }) => {
     'Safe fix: Designed to handle the new format while keeping the old format working.';
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden" data-testid="remediation-diff">
       <CardHeader className="py-3 px-5 bg-forge-surface-elevated/40">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 w-full">
           <div className="flex items-center gap-2">

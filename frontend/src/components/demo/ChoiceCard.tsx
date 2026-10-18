@@ -17,6 +17,7 @@ export interface ChoiceCardProps {
 }
 
 export const ChoiceCard: React.FC<ChoiceCardProps> = ({
+  id,
   title,
   technicalLabel,
   description,
@@ -29,6 +30,7 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
     <div
       role="button"
       tabIndex={0}
+      data-testid={`simulator-choice-${id}`}
       onClick={onSelect}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {

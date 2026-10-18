@@ -17,7 +17,7 @@ export const SafeTestResults: React.FC<SafeTestResultsProps> = ({
   const [showLog, setShowLog] = useState(false);
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden" data-testid="safe-test-results">
       <CardHeader className="py-3 px-5 bg-forge-surface-elevated/40">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">

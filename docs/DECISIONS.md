@@ -73,3 +73,10 @@ This document tracks technical decisions made during the development of DriftSmi
   3. Add comprehensive smoke test coverage (`src/test/smoke.test.tsx`) asserting all 5 primary flows (login, simulation trigger, detail inspection, approval & PR preview, presenter mode).
   4. Enforce ESLint rules (`no-console` with error/warn allowance, `max-lines` 200, strict type safety) and add unified `npm run check`.
 
+### DEC-013: Spoken Voice Narration with Visual Presenter Sync (Phase 2)
+- **Context:** Presenter mode previously relied only on subtitle captions. Spoken narration elevates hackathon demos while ensuring visual state stays strictly synchronized with audio playback.
+- **Decision:**
+  1. Create a `VoiceNarrator` interface (`speak`, `cancel`, `pause`, `resume`, `isAvailable`, `setVolume`, `setVoice`, `getAvailableVoices`) with three implementations: `SpeechSynthesisNarrator` (browser Web Speech API, defaulting to Indian English / Priya persona or natural voice), `AudioFileNarrator` (playing pre-recorded `/narration/<stepId>.mp3` with fallback), and `SilentNarrator` (cadence timing at 375ms/word).
+  2. Implement `usePresenterNarration` and `usePresenterDriver` to drive the demo: steps advance only after narration finishes (or audio duration elapses), visuals trigger at defined checkpoints, and narrator audio controls (voice selector, volume, mute, speed toggle) are embedded in `PresenterOverlay`.
+  3. Support `VITE_NARRATION=speech|audio|off` via environment config with automatic graceful fallback when Web Speech is unsupported or audio files are missing.
+

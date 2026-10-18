@@ -1,7 +1,7 @@
 // The Live Demo Stage (Home Page) for DriftSmith.
-// Coordinates simulator controls, real-time remediation stage, and automated presenter walkthrough.
+// Coordinates simulator controls, real-time remediation stage, and synchronized voice walkthrough.
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Scenario } from '@/api/types';
 import { useRuns } from '@/hooks/useRuns';
@@ -11,8 +11,9 @@ import { useTriggerDrift } from '@/hooks/useTriggerDrift';
 import { useApprove } from '@/hooks/useApprove';
 import { usePatterns } from '@/hooks/usePatterns';
 import { useToast } from '@/components/ui/Toast';
+import { usePresenterDriver } from '@/hooks/usePresenterDriver';
 import { RemediationStage } from '@/components/runs/RemediationStage';
-import { PresenterOverlay, PRESENTER_STEPS } from '@/components/demo/PresenterOverlay';
+import { PresenterOverlay } from '@/components/demo/PresenterOverlay';
 import { SimulatorHeader } from '@/components/demo/SimulatorHeader';
 import { SimulatorControls, AppTarget } from '@/components/demo/SimulatorControls';
 import { RecentRunsTable } from '@/components/demo/RecentRunsTable';
@@ -24,19 +25,12 @@ export const DashboardPage: React.FC = () => {
   const [selectedApp, setSelectedApp] = useState<AppTarget>('Payment app');
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
 
-  // Presenter Mode state
-  const [isPresenterMode, setIsPresenterMode] = useState(false);
-  const [presenterStepIndex, setPresenterStepIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [speed, setSpeed] = useState<1 | 2>(1);
-
   const { data: runs = [], refetch: refetchRuns } = useRuns();
   const { data: patterns = [] } = usePatterns();
   const triggerMutation = useTriggerDrift();
   const approveMutation = useApprove();
   const { toast } = useToast();
 
-  // Active run details
   const { data: activeRun, refetch: refetchActiveRun } = useRun(activeRunId || undefined);
 
   const isCompletedInitially =
@@ -49,7 +43,6 @@ export const DashboardPage: React.FC = () => {
     isCompletedInitially
   );
 
-  // Check if chosen scenario has a remembered fix
   const scenarioData = DRIFT_SCENARIOS[selectedScenario];
   const hasRememberedFix = patterns.some(
     (p) => p.fingerprint === scenarioData?.driftReport?.fingerprint
@@ -58,10 +51,7 @@ export const DashboardPage: React.FC = () => {
     selectedApp === 'Second payment app (has seen this problem before)' && hasRememberedFix;
 
   const handleSimulate = useCallback(
-    async (
-      overrideScenario?: Scenario,
-      overrideApp?: AppTarget
-    ) => {
+    async (overrideScenario?: Scenario, overrideApp?: AppTarget) => {
       const scenarioToRun = overrideScenario || selectedScenario;
       const appToRun = overrideApp || selectedApp;
 
@@ -97,58 +87,20 @@ export const DashboardPage: React.FC = () => {
     }
   }, [activeRunId, approveMutation, toast, refetchActiveRun, refetchRuns]);
 
-  // Automated Presenter Mode Driver
-  useEffect(() => {
-    if (!isPresenterMode || !isPlaying) return;
-
-    const baseDelay = (ms: number) => ms / speed;
-    let timer: ReturnType<typeof setTimeout>;
-
-    switch (presenterStepIndex) {
-      case 0:
-        timer = setTimeout(() => setPresenterStepIndex(1), baseDelay(6000));
-        break;
-      case 1:
-        setSelectedScenario('type');
-        setSelectedApp('Payment app');
-        handleSimulate('type', 'Payment app');
-        timer = setTimeout(() => setPresenterStepIndex(2), baseDelay(8000));
-        break;
-      case 2:
-      case 3:
-      case 4:
-        timer = setTimeout(() => setPresenterStepIndex((i) => i + 1), baseDelay(6000));
-        break;
-      case 5:
-        if (activeRunId) handleApprove();
-        timer = setTimeout(() => setPresenterStepIndex(6), baseDelay(7000));
-        break;
-      case 6:
-        setSelectedScenario('type');
-        setSelectedApp('Second payment app (has seen this problem before)');
-        handleSimulate('type', 'Second payment app (has seen this problem before)');
-        timer = setTimeout(() => setPresenterStepIndex(7), baseDelay(6000));
-        break;
-      case 7:
-        break;
-      default:
-        break;
-    }
-
-    return () => clearTimeout(timer);
-  }, [isPresenterMode, presenterStepIndex, isPlaying, speed, activeRunId, handleSimulate, handleApprove]);
-
-  const startGuidedDemo = () => {
-    setIsPresenterMode(true);
-    setPresenterStepIndex(0);
-    setIsPlaying(true);
-  };
+  // Hook driving automated presenter walkthrough and spoken narration
+  const presenter = usePresenterDriver({
+    activeRunId,
+    onSimulate: handleSimulate,
+    onApprove: handleApprove,
+    onSelectScenario: setSelectedScenario,
+    onSelectApp: setSelectedApp,
+  });
 
   const recentRuns = runs.slice(0, 5);
 
   return (
     <div className="max-w-[1100px] mx-auto space-y-10 py-2">
-      <SimulatorHeader onStartGuidedDemo={startGuidedDemo} />
+      <SimulatorHeader onStartGuidedDemo={presenter.startGuidedDemo} />
 
       <SimulatorControls
         selectedScenario={selectedScenario}
@@ -203,16 +155,23 @@ export const DashboardPage: React.FC = () => {
 
       <RecentRunsTable runs={recentRuns} onSelectRun={setActiveRunId} />
 
-      {isPresenterMode && (
+      {presenter.isPresenterMode && (
         <PresenterOverlay
-          currentStepIndex={presenterStepIndex}
-          isPlaying={isPlaying}
-          speed={speed}
-          onTogglePlay={() => setIsPlaying(!isPlaying)}
-          onNext={() => setPresenterStepIndex((prev) => Math.min(prev + 1, PRESENTER_STEPS.length - 1))}
-          onPrev={() => setPresenterStepIndex((prev) => Math.max(prev - 1, 0))}
-          onToggleSpeed={() => setSpeed((prev) => (prev === 1 ? 2 : 1))}
-          onExit={() => setIsPresenterMode(false)}
+          currentStepIndex={presenter.presenterStepIndex}
+          isPlaying={presenter.isPlaying}
+          speed={presenter.speed}
+          isMuted={presenter.narration.isMuted}
+          volume={presenter.narration.volume}
+          availableVoices={presenter.narration.availableVoices}
+          selectedVoice={presenter.narration.selectedVoice}
+          onTogglePlay={presenter.handleTogglePlay}
+          onNext={presenter.handleNextStep}
+          onPrev={presenter.handlePrevStep}
+          onToggleSpeed={() => presenter.setSpeed((prev) => (prev === 1 ? 2 : 1))}
+          onToggleMute={() => presenter.narration.setMuted(!presenter.narration.isMuted)}
+          onVolumeChange={presenter.narration.setVolume}
+          onVoiceChange={presenter.narration.setVoice}
+          onExit={presenter.handleExitDemo}
         />
       )}
     </div>
