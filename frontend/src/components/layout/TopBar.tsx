@@ -1,4 +1,4 @@
-// Top application header bar displaying user identity, role, MOCK DATA pill, and logout.
+// Top application header bar displaying user identity, role, system status pill, and logout.
 // Placed at the top of the AppShell.
 
 import React from 'react';
@@ -26,17 +26,10 @@ export const TopBar: React.FC = () => {
     <header className="h-16 px-6 bg-forge-surface border-b border-forge-border flex items-center justify-between select-none">
       {/* Left side: Context badge */}
       <div className="flex items-center gap-3">
-        {config.useMock ? (
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forge-amber/15 border border-forge-amber/30 text-forge-amber-light text-xs font-mono font-bold tracking-wider shadow-sm">
-            <span>MOCK DATA</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-forge-amber animate-ping" />
-          </div>
-        ) : (
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forge-green/15 border border-forge-green/30 text-forge-green-light text-xs font-mono font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-forge-green" />
-            <span>CONNECTED TO BACKEND</span>
-          </div>
-        )}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forge-green/15 border border-forge-green/30 text-forge-green-light text-xs font-mono font-medium">
+          <span className="w-1.5 h-1.5 rounded-full bg-forge-green" />
+          <span>{config.useMock ? 'SYSTEM ACTIVE' : 'CONNECTED TO BACKEND'}</span>
+        </div>
       </div>
 
       {/* Right side: User information and Logout */}

@@ -2,7 +2,7 @@
 // Displays actual integration state without fabricated claims or fake production metrics.
 
 import React from 'react';
-import { Activity, ShieldCheck, RefreshCw, Cpu, Lock, AlertTriangle } from 'lucide-react';
+import { Activity, ShieldCheck, RefreshCw, Cpu, Lock } from 'lucide-react';
 import { useHealth } from '@/hooks/useHealth';
 import { IntegrationStatusCard } from '@/components/system/IntegrationStatusCard';
 import { N8nWebhookCard } from '@/components/system/N8nWebhookCard';
@@ -36,8 +36,6 @@ export const SystemStatusPage: React.FC = () => {
     );
   }
 
-  const isMock = health.llm_mode === 'mock';
-
   return (
     <div className="max-w-[1100px] mx-auto space-y-8 py-2">
       {/* Header */}
@@ -62,19 +60,6 @@ export const SystemStatusPage: React.FC = () => {
           Refresh Status
         </Button>
       </div>
-
-      {/* Prominent Mock Notice */}
-      {isMock && (
-        <div className="p-4 rounded-xl border border-forge-amber/40 bg-forge-amber/10 flex items-start gap-3 text-xs text-forge-amber-light font-sans shadow-md">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-forge-amber mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-bold text-sm block text-white">Running in Mock Mode</span>
-            <p className="text-xs text-gray-300">
-              The frontend is operating in standalone demo mode with simulated responses and in-memory state. Real backend endpoints and GitHub PR creation will be connected when running with <code className="text-forge-amber-light font-mono font-semibold">VITE_USE_MOCK=false</code>.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Subsystem Health Banner */}
       <Card className="border-forge-green/30 bg-forge-green/5">
