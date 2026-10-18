@@ -9,7 +9,7 @@ This document tracks technical decisions made during the development of DriftSmi
 - **Decision:** Implement a single `ApiClient` interface (`src/api/apiClient.ts`) backed by two implementations:
   1. `mockClient.ts` simulating realistic network delays (150-300ms), in-memory state mutations, and mock events.
   2. `httpClient.ts` making real HTTP requests with automatic Bearer token injection and centralized 401 handling.
-- **Consequence:** Frontend developers and demo presenters can run the full lifecycle without running local databases or Docker containers. Switching modes requires changing only `VITE_USE_MOCK=false`.
+- **Consequence:** Frontend developers and engineers can run the full lifecycle without running local databases or Docker containers. Switching modes requires changing only `VITE_USE_MOCK=false`.
 
 ### DEC-002: Real-Time Event Streaming Contract via `EventStream`
 - **Context:** Drift diagnosis, patch generation, and sandbox testing emit continuous agent thoughts and actions.
