@@ -1,314 +1,391 @@
-// Event timeline fixtures and step definitions for DriftSmith runs.
-// Simulates multi-agent reasoning, code localization, sandboxing, and PR generation.
+// Plain-English event timeline fixtures and step definitions for DriftSmith runs.
+// Agents are presented with friendly roles: Detector, Investigator, Code writer, Reviewer, Tester, Reporter.
 
 import { RunEvent, Scenario } from '@/api/types';
 
 export interface EventStepTemplate {
   agent: RunEvent['agent'];
+  friendlyRole: string;
   kind: RunEvent['kind'];
   message: string;
   delayMs: number;
-  payload?: Record<string, unknown>;
+  storyStep: number; // 1: API changed, 2: Problem found, 3: Fix written, 4: Fix tested, 5: Ready for approval
+  isRetry?: boolean;
+  technicalDetails?: Record<string, unknown>;
 }
 
 /**
- * Builds the event progression sequence for a fresh LLM-based drift resolution run (~20-22 seconds total).
+ * Builds the event progression sequence for a fresh run (~20-22 seconds total).
  */
 export function buildFreshRunSequence(scenario: Scenario): EventStepTemplate[] {
-  const commonHeader: EventStepTemplate[] = [
-    {
-      agent: 'system',
-      kind: 'info',
-      message: 'Self-healing orchestrator initiated run sequence.',
-      delayMs: 600,
-      payload: { mode: 'autonomous', pipeline_version: '1.2.0' },
-    },
-    {
-      agent: 'sentinel',
-      kind: 'thought',
-      message: 'Ingesting failing webhook payload from incoming error stream...',
-      delayMs: 1400,
-    },
-    {
-      agent: 'sentinel',
-      kind: 'success',
-      message: 'Detected schema drift: Payload schema diverged from stored contract specification.',
-      delayMs: 1600,
-      payload: { divergence_score: 0.94 },
-    },
-    {
-      agent: 'memory',
-      kind: 'info',
-      message: 'Checking pattern memory cache for matching schema fingerprint...',
-      delayMs: 1000,
-    },
-    {
-      agent: 'memory',
-      kind: 'warning',
-      message: 'No exact fingerprint match found in local pattern memory. Escalating to LLM synthesis tier.',
-      delayMs: 1200,
-    },
-    {
-      agent: 'triage',
-      kind: 'thought',
-      message: 'Analyzing syntactic differences between expected schema and mutated payload...',
-      delayMs: 1800,
-    },
-  ];
-
-  if (scenario === 'rename') {
-    return [
-      ...commonHeader,
-      {
-        agent: 'triage',
-        kind: 'success',
-        message: 'Identified renamed key: `amount_in_cents` moved to `total_amount` (Confidence: 98%).',
-        delayMs: 1800,
-        payload: { confidence: 0.98, key_from: 'amount_in_cents', key_to: 'total_amount' },
-      },
-      {
-        agent: 'locator',
-        kind: 'action',
-        message: 'Scanning AST: Located handler site in `services/payment_webhook.py:17`.',
-        delayMs: 1600,
-        payload: { file: 'services/payment_webhook.py', line: 17 },
-      },
-      {
-        agent: 'coder',
-        kind: 'thought',
-        message: 'Synthesizing dual-compatibility patch to support both total_amount and amount_in_cents...',
-        delayMs: 2200,
-      },
-      {
-        agent: 'coder',
-        kind: 'action',
-        message: 'Emitted backward-compatible patch hunk for `services/payment_webhook.py`.',
-        delayMs: 1800,
-      },
-      {
-        agent: 'verifier',
-        kind: 'thought',
-        message: 'Spinning up isolated sandbox container to run dual payload test suite...',
-        delayMs: 2000,
-      },
-      {
-        agent: 'verifier',
-        kind: 'success',
-        message: 'Sandbox tests passed: Old payload PASS (24ms) | New payload PASS (28ms).',
-        delayMs: 2200,
-        payload: { tests_passed: 2, total_tests: 2 },
-      },
-      {
-        agent: 'pr',
-        kind: 'action',
-        message: 'Generated dry-run pull request branch: `fix/drift-amount-in-cents-rename`.',
-        delayMs: 1800,
-        payload: { branch: 'fix/drift-amount-in-cents-rename', dry_run: true },
-      },
-      {
-        agent: 'system',
-        kind: 'info',
-        message: 'run_finished',
-        delayMs: 800,
-      },
-    ];
-  }
-
   if (scenario === 'type') {
     return [
-      ...commonHeader,
+      {
+        agent: 'system',
+        friendlyRole: 'Coordinator',
+        kind: 'info',
+        message: '1. API changed: Payment provider sent updated payment data with changed schema.',
+        delayMs: 600,
+        storyStep: 1,
+        technicalDetails: { scenario: 'type_changed', endpoint: '/webhook/payment' },
+      },
+      {
+        agent: 'sentinel',
+        friendlyRole: 'Detector',
+        kind: 'thought',
+        message: 'Detector is examining the failing payment payload...',
+        delayMs: 1400,
+        storyStep: 1,
+      },
+      {
+        agent: 'sentinel',
+        friendlyRole: 'Detector',
+        kind: 'success',
+        message: '2. Problem found: Payment provider silently changed the price format in its payload.',
+        delayMs: 1600,
+        storyStep: 2,
+        technicalDetails: { expected: 'integer paise (49900)', received: 'string rupees ("499.00")' },
+      },
       {
         agent: 'triage',
-        kind: 'success',
-        message: 'Identified type mutation: Integer paise converted to decimal string rupees (Confidence: 96%).',
+        friendlyRole: 'Investigator',
+        kind: 'thought',
+        message: 'Investigator diagnosed: your app expects integer 49900, but received decimal string "499.00".',
         delayMs: 1800,
-        payload: { confidence: 0.96, expected: 'int (paise)', actual: 'str ("499.00")' },
+        storyStep: 2,
+        technicalDetails: { field: 'payment.amount', type_from: 'int', type_to: 'str', confidence: 0.96 },
       },
       {
         agent: 'locator',
+        friendlyRole: 'Code writer',
         kind: 'action',
-        message: 'Scanning AST: Located currency parser in `services/payment_webhook.py:28`.',
+        message: 'Code writer located the amount parser in services/payment_webhook.py:28.',
         delayMs: 1600,
-        payload: { file: 'services/payment_webhook.py', line: 28 },
+        storyStep: 3,
+        technicalDetails: { file: 'services/payment_webhook.py', line: 28 },
       },
       {
         agent: 'coder',
+        friendlyRole: 'Code writer',
         kind: 'thought',
-        message: 'Drafting initial type cast parser for `parse_charge_amount`...',
+        message: '3. Fix written: Drafted a code change that converts string amounts back to integer paise.',
         delayMs: 2000,
+        storyStep: 3,
       },
       {
         agent: 'verifier',
+        friendlyRole: 'Tester',
         kind: 'action',
-        message: 'Executing sandbox test suite against initial patch candidate...',
+        message: '4. Fix tested: Running tests in safe test room...',
         delayMs: 1800,
+        storyStep: 4,
       },
       {
         agent: 'verifier',
+        friendlyRole: 'Tester',
         kind: 'error',
-        message: 'Sandbox verification failed: Decimal string "499.00" caused float precision truncation error in test_decimal_string_amount_rupees.',
+        message: 'Safe test room test 1 failed: Direct float conversion lost precision on decimal string "499.00".',
         delayMs: 2000,
-        payload: { failed_test: 'test_decimal_string_amount_rupees', exit_code: 1 },
+        storyStep: 4,
+        isRetry: true,
+        technicalDetails: { error: 'PrecisionTruncationError in test_decimal_string_amount_rupees' },
       },
       {
         agent: 'critic',
+        friendlyRole: 'Reviewer',
         kind: 'thought',
-        message: 'Evaluating failure trace: Direct float casting suffers precision loss. Advising round(float * 100) with string sanitization.',
+        message: 'Reviewer explained: Direct float conversion drops cents; use round(float * 100) after sanitizing strings.',
         delayMs: 2200,
+        storyStep: 4,
+        isRetry: true,
+        technicalDetails: { advice: 'Coerce string with clean replace and round to prevent IEEE 754 precision issues' },
       },
       {
         agent: 'coder',
+        friendlyRole: 'Code writer',
         kind: 'action',
-        message: 'Refactoring patch with Critic feedback: Added clean string sanitization and exact integer rounding.',
+        message: 'Code writer updated the fix following the Reviewer advice.',
         delayMs: 2000,
+        storyStep: 3,
       },
       {
         agent: 'verifier',
+        friendlyRole: 'Tester',
         kind: 'thought',
-        message: 'Re-running sandbox test suite against refined patch candidate...',
+        message: 'Re-running tests in safe test room with the corrected fix...',
         delayMs: 1800,
+        storyStep: 4,
       },
       {
         agent: 'verifier',
+        friendlyRole: 'Tester',
         kind: 'success',
-        message: 'Sandbox verification PASSED: Integer paise PASS (31ms) | Decimal string PASS (34ms).',
+        message: 'Tests passed! Works with both the OLD data (31ms) and the NEW data (34ms).',
         delayMs: 2200,
-        payload: { tests_passed: 2, total_tests: 2, retries: 1 },
+        storyStep: 4,
+        technicalDetails: { old_data_test: 'passed', new_data_test: 'passed', regressions: 0 },
       },
       {
         agent: 'pr',
+        friendlyRole: 'Reporter',
         kind: 'action',
-        message: 'Generated dry-run pull request branch: `fix/drift-amount-type-coercion`.',
+        message: '5. Ready for your approval: Created a proposed pull request preview for your team.',
         delayMs: 1800,
-        payload: { branch: 'fix/drift-amount-type-coercion', dry_run: true },
+        storyStep: 5,
+        technicalDetails: { branch: 'driftsmith/fix-price-format-payment-app', preview: true },
       },
       {
         agent: 'system',
+        friendlyRole: 'Coordinator',
         kind: 'info',
         message: 'run_finished',
         delayMs: 800,
+        storyStep: 5,
       },
     ];
   }
 
-  // Nested scenario
+  if (scenario === 'rename') {
+    return [
+      {
+        agent: 'system',
+        friendlyRole: 'Coordinator',
+        kind: 'info',
+        message: '1. API changed: Payment provider sent updated payment payload.',
+        delayMs: 600,
+        storyStep: 1,
+      },
+      {
+        agent: 'sentinel',
+        friendlyRole: 'Detector',
+        kind: 'thought',
+        message: 'Detector is inspecting the failing payload...',
+        delayMs: 1400,
+        storyStep: 1,
+      },
+      {
+        agent: 'sentinel',
+        friendlyRole: 'Detector',
+        kind: 'success',
+        message: '2. Problem found: Field amount_in_cents was renamed to total_amount.',
+        delayMs: 1600,
+        storyStep: 2,
+        technicalDetails: { from: 'amount_in_cents', to: 'total_amount', confidence: 0.98 },
+      },
+      {
+        agent: 'triage',
+        friendlyRole: 'Investigator',
+        kind: 'thought',
+        message: 'Investigator diagnosed: your app expects amount_in_cents, but the provider now sends total_amount.',
+        delayMs: 1600,
+        storyStep: 2,
+        technicalDetails: { from: 'amount_in_cents', to: 'total_amount', confidence: 0.98 },
+      },
+      {
+        agent: 'locator',
+        friendlyRole: 'Code writer',
+        kind: 'action',
+        message: 'Code writer located handler at services/payment_webhook.py:17.',
+        delayMs: 1600,
+        storyStep: 3,
+      },
+      {
+        agent: 'coder',
+        friendlyRole: 'Code writer',
+        kind: 'thought',
+        message: '3. Fix written: Code updated to read total_amount while still accepting amount_in_cents.',
+        delayMs: 2000,
+        storyStep: 3,
+      },
+      {
+        agent: 'verifier',
+        friendlyRole: 'Tester',
+        kind: 'action',
+        message: '4. Fix tested: Running tests in safe test room...',
+        delayMs: 1800,
+        storyStep: 4,
+      },
+      {
+        agent: 'verifier',
+        friendlyRole: 'Tester',
+        kind: 'success',
+        message: 'Tests passed! Works with both the OLD data (24ms) and the NEW data (28ms).',
+        delayMs: 2200,
+        storyStep: 4,
+        technicalDetails: { old_data_test: 'passed', new_data_test: 'passed' },
+      },
+      {
+        agent: 'pr',
+        friendlyRole: 'Reporter',
+        kind: 'action',
+        message: '5. Ready for your approval: Created a proposed pull request preview for your team.',
+        delayMs: 1800,
+        storyStep: 5,
+        technicalDetails: { branch: 'driftsmith/fix-renamed-field-payment-app', preview: true },
+      },
+      {
+        agent: 'system',
+        friendlyRole: 'Coordinator',
+        kind: 'info',
+        message: 'run_finished',
+        delayMs: 800,
+        storyStep: 5,
+      },
+    ];
+  }
+
+  // Nested scenario (Email moved)
   return [
-    ...commonHeader,
+    {
+      agent: 'system',
+      friendlyRole: 'Coordinator',
+      kind: 'info',
+      message: '1. API changed: Payment provider updated payload customer structure.',
+      delayMs: 600,
+      storyStep: 1,
+    },
+    {
+      agent: 'sentinel',
+      friendlyRole: 'Detector',
+      kind: 'thought',
+      message: 'Detector is inspecting the nested payload...',
+      delayMs: 1400,
+      storyStep: 1,
+    },
+    {
+      agent: 'sentinel',
+      friendlyRole: 'Detector',
+      kind: 'success',
+      message: '2. Problem found: Email field was moved from customer.email to payer.contact.email.',
+      delayMs: 1600,
+      storyStep: 2,
+      technicalDetails: { from: 'customer.email', to: 'payer.contact.email', confidence: 0.94 },
+    },
     {
       agent: 'triage',
-      kind: 'success',
-      message: 'Identified path restructure: `customer.email` relocated to `payer.contact.email` (Confidence: 94%).',
-      delayMs: 1800,
-      payload: { confidence: 0.94, old_path: 'customer.email', new_path: 'payer.contact.email' },
+      friendlyRole: 'Investigator',
+      kind: 'thought',
+      message: 'Investigator diagnosed: customer.email was relocated to payer.contact.email.',
+      delayMs: 1600,
+      storyStep: 2,
+      technicalDetails: { from: 'customer.email', to: 'payer.contact.email', confidence: 0.94 },
     },
     {
       agent: 'locator',
+      friendlyRole: 'Code writer',
       kind: 'action',
-      message: 'Scanning AST: Located nested customer accessor in `services/payment_webhook.py:42`.',
+      message: 'Code writer located customer receipt helper in services/payment_webhook.py:42.',
       delayMs: 1600,
+      storyStep: 3,
     },
     {
       agent: 'coder',
+      friendlyRole: 'Code writer',
       kind: 'thought',
-      message: 'Generating fallback dictionary traversal with safe null-coalescing...',
+      message: '3. Fix written: Code updated to check payer.contact.email first, with fallback to customer.email.',
       delayMs: 2000,
+      storyStep: 3,
     },
     {
-      agent: 'coder',
+      agent: 'verifier',
+      friendlyRole: 'Tester',
       kind: 'action',
-      message: 'Emitted safe hierarchical accessor patch.',
+      message: '4. Fix tested: Running tests in safe test room...',
       delayMs: 1800,
+      storyStep: 4,
     },
     {
       agent: 'verifier',
-      kind: 'thought',
-      message: 'Dispatching sandbox tests for nested payload variations...',
-      delayMs: 1800,
-    },
-    {
-      agent: 'verifier',
+      friendlyRole: 'Tester',
       kind: 'success',
-      message: 'Sandbox verification PASSED: Legacy flat format PASS (22ms) | Nested format PASS (26ms).',
+      message: 'Tests passed! Works with both the OLD data (22ms) and the NEW data (26ms).',
       delayMs: 2000,
-      payload: { tests_passed: 2, total_tests: 2 },
+      storyStep: 4,
+      technicalDetails: { old_data_test: 'passed', new_data_test: 'passed' },
     },
     {
       agent: 'pr',
+      friendlyRole: 'Reporter',
       kind: 'action',
-      message: 'Generated dry-run pull request branch: `fix/drift-nested-customer-path`.',
+      message: '5. Ready for your approval: Created a proposed pull request preview for your team.',
       delayMs: 1800,
-      payload: { branch: 'fix/drift-nested-customer-path', dry_run: true },
+      storyStep: 5,
+      technicalDetails: { branch: 'driftsmith/fix-moved-email-payment-app', preview: true },
     },
     {
       agent: 'system',
+      friendlyRole: 'Coordinator',
       kind: 'info',
       message: 'run_finished',
       delayMs: 800,
+      storyStep: 5,
     },
   ];
 }
 
 /**
- * Builds the rapid memory-healed event sequence (0 LLM calls, ~4-5 seconds total).
+ * Builds the instant memory-healed sequence (0 AI calls, ~5 seconds total).
  */
-export function buildMemoryHealedSequence(fingerprint: string): EventStepTemplate[] {
+export function buildMemoryHealedSequence(_fingerprint: string): EventStepTemplate[] {
   return [
     {
       agent: 'system',
+      friendlyRole: 'Coordinator',
       kind: 'info',
-      message: 'Self-healing orchestrator initiated run sequence.',
+      message: '1. API changed: Second payment app received changed API data.',
       delayMs: 400,
+      storyStep: 1,
     },
     {
       agent: 'sentinel',
+      friendlyRole: 'Detector',
       kind: 'thought',
-      message: 'Ingesting failing webhook payload from target service...',
+      message: 'Detector is checking if DriftSmith has seen this exact problem before...',
       delayMs: 600,
-    },
-    {
-      agent: 'sentinel',
-      kind: 'success',
-      message: 'Detected schema drift: Computed payload fingerprint.',
-      delayMs: 600,
+      storyStep: 1,
     },
     {
       agent: 'memory',
-      kind: 'thought',
-      message: `Querying pattern memory store for fingerprint ${fingerprint}...`,
-      delayMs: 600,
-    },
-    {
-      agent: 'memory',
+      friendlyRole: 'Memory',
       kind: 'success',
-      message: 'PATTERN CACHE HIT: Exact matching patch recipe found in learned memory. Skipping LLM synthesis!',
-      delayMs: 800,
-      payload: { zero_llm_call: true, cached_recipe_id: 'pat-901' },
-    },
-    {
-      agent: 'verifier',
-      kind: 'thought',
-      message: 'Executing fast verification in sandbox to ensure zero regressions against local codebase...',
+      message: '2. Instant fix from memory: DriftSmith remembers this fix from earlier! Skipping AI code writing.',
       delayMs: 900,
+      storyStep: 3,
+      technicalDetails: { zero_ai_calls: true, source: 'remembered_fix_cache' },
     },
     {
       agent: 'verifier',
+      friendlyRole: 'Tester',
+      kind: 'thought',
+      message: '4. Fix tested: Checking the remembered fix in the safe test room...',
+      delayMs: 900,
+      storyStep: 4,
+    },
+    {
+      agent: 'verifier',
+      friendlyRole: 'Tester',
       kind: 'success',
-      message: 'Sandbox tests validated cached patch: 2 tests passed (42ms total).',
+      message: 'Tests passed! Works with both OLD data and NEW data (38ms).',
       delayMs: 800,
-      payload: { verified: true },
+      storyStep: 4,
+      technicalDetails: { old_data: 'passed', new_data: 'passed', duration_ms: 38 },
     },
     {
       agent: 'pr',
+      friendlyRole: 'Reporter',
       kind: 'action',
-      message: 'Applied cached patch recipe to pull request branch: `fix/memory-heal-target-app-b`.',
-      delayMs: 600,
-      payload: { branch: 'fix/memory-heal-target-app-b', dry_run: true },
+      message: '5. Ready for your approval: Instant pull request preview prepared in ~5 seconds with 0 AI calls.',
+      delayMs: 700,
+      storyStep: 5,
+      technicalDetails: { branch: 'driftsmith/fix-second-payment-app-memory', preview: true },
     },
     {
       agent: 'system',
+      friendlyRole: 'Coordinator',
       kind: 'info',
       message: 'run_finished',
       delayMs: 400,
+      storyStep: 5,
     },
   ];
 }

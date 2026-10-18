@@ -1,11 +1,10 @@
 // Timer-based simulated EventStream implementation for mock mode.
-// Replays realistic multi-agent sequences (sentinel, triage, locator, coder, critic, verifier, pr, system).
+// Replays realistic multi-agent sequences with plain-English friendly roles and story step trackers.
 
 import { EventStream, EventStreamOptions, EventStreamSubscription } from './eventStream';
 import { RunEvent, Scenario } from './types';
 import { buildFreshRunSequence, buildMemoryHealedSequence, EventStepTemplate } from '@/mock/events';
 
-// In-memory registry to determine if a run is memory-healed and its scenario
 interface MockRunStreamMetadata {
   scenario: Scenario;
   isMemoryHealed: boolean;
@@ -38,9 +37,9 @@ export class MockStream implements EventStream {
   subscribe(options: EventStreamOptions): EventStreamSubscription {
     const { runId, onEvent, onFinished } = options;
     const meta = runStreamMetadata.get(runId) || {
-      scenario: 'rename',
+      scenario: 'type',
       isMemoryHealed: false,
-      fingerprint: 'fp_rename_amount_in_cents_9b2e',
+      fingerprint: 'fp_type_amount_str_decimal_44c1',
     };
 
     const steps = getMockRunSequence(meta.scenario, meta.isMemoryHealed, meta.fingerprint);
@@ -69,7 +68,12 @@ export class MockStream implements EventStream {
           agent: currentStep.agent,
           kind: currentStep.kind,
           message: currentStep.message,
-          payload: currentStep.payload || null,
+          payload: {
+            friendlyRole: currentStep.friendlyRole,
+            storyStep: currentStep.storyStep,
+            isRetry: Boolean(currentStep.isRetry),
+            ...(currentStep.technicalDetails || {}),
+          },
           created_at: new Date().toISOString(),
         };
 
@@ -84,7 +88,6 @@ export class MockStream implements EventStream {
       }, currentStep.delayMs);
     };
 
-    // Kick off sequence
     scheduleNext();
 
     return {

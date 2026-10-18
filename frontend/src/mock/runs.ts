@@ -1,5 +1,5 @@
-// Fixtures for pre-seeded historical runs with full RunDetail representations.
-// Provides realistic state across verified, awaiting_approval, approved, and failed runs.
+// Fixtures for pre-seeded historical runs with plain-English service names and PR previews.
+// Provides historical data for the recent fixes list and history table.
 
 import { RunDetail } from '@/api/types';
 import { DRIFT_SCENARIOS } from './drifts';
@@ -10,7 +10,7 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
   {
     id: 'run-101',
     scenario: 'rename',
-    service_name: 'payment-gateway',
+    service_name: 'Payment app',
     source: 'webhook',
     status: 'awaiting_approval',
     confidence: 0.98,
@@ -24,7 +24,7 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
     patch: DRIFT_SCENARIOS.rename.patch,
     pull_request: {
       url: null,
-      branch: 'fix/drift-amount-in-cents-rename',
+      branch: 'driftsmith/fix-run-101',
       status: 'dry_run',
       dry_run: true,
     },
@@ -32,7 +32,7 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
   {
     id: 'run-102',
     scenario: 'type',
-    service_name: 'billing-service',
+    service_name: 'Billing app',
     source: 'ci',
     status: 'approved',
     confidence: 0.96,
@@ -45,18 +45,18 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
     drift_report: DRIFT_SCENARIOS.type.driftReport,
     patch: DRIFT_SCENARIOS.type.patch,
     pull_request: {
-      url: 'https://github.com/org/payments-core/pull/482',
-      branch: 'fix/drift-amount-type-coercion',
-      status: 'open',
-      dry_run: false,
+      url: null,
+      branch: 'driftsmith/fix-run-102',
+      status: 'dry_run',
+      dry_run: true,
     },
   },
   {
     id: 'run-103',
     scenario: 'nested',
-    service_name: 'checkout-api',
+    service_name: 'Checkout app',
     source: 'manual',
-    status: 'verified',
+    status: 'approved',
     confidence: 0.94,
     verified: true,
     healed_from_memory: true,
@@ -68,7 +68,7 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
     patch: DRIFT_SCENARIOS.nested.patch,
     pull_request: {
       url: null,
-      branch: 'fix/drift-nested-customer-path',
+      branch: 'driftsmith/fix-run-103',
       status: 'dry_run',
       dry_run: true,
     },
@@ -76,7 +76,7 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
   {
     id: 'run-104',
     scenario: 'rename',
-    service_name: 'legacy-listener',
+    service_name: 'Legacy listener',
     source: 'webhook',
     status: 'failed',
     confidence: 0.42,
@@ -88,13 +88,13 @@ export const INITIAL_MOCK_RUNS: RunDetail[] = [
     finished_at: new Date(now - 1000 * 60 * 60 * 36 + 25000).toISOString(),
     drift_report: {
       fingerprint: 'fp_unresolved_legacy_drift_0x1',
-      summary: 'Ambiguous schema changes detected across multiple undocumented nested keys.',
+      summary: 'Multiple undocumented fields were modified simultaneously.',
       risk: 'high',
       changes: [
         {
           type: 'removed',
-          path: 'metadata.internal_trace_key',
-          from: 'metadata.internal_trace_key',
+          path: 'metadata.legacy_id',
+          from: 'metadata.legacy_id',
           to: null,
           confidence: 0.42,
         },

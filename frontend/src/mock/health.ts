@@ -1,5 +1,5 @@
-// System health and integration state fixtures for DriftSmith diagnostics.
-// Used by SystemStatusPage and backend health probes.
+// System health and subsystem integration status for DriftSmith.
+// Strictly honest telemetry without fabricated production claims.
 
 import { HealthResponse } from '@/api/types';
 
@@ -11,32 +11,32 @@ export const MOCK_HEALTH: HealthResponse = {
     {
       name: 'database',
       status: 'live',
-      detail: 'PostgreSQL connection pool healthy (12 active connections, 4ms latency).',
+      detail: 'SQLite (demo)',
     },
     {
       name: 'llm',
       status: 'live',
-      detail: 'Anthropic Claude 3.5 Sonnet connected with fallback routing enabled.',
+      detail: 'Gemma via Gemini API - mock mode',
     },
     {
       name: 'github',
-      status: 'live',
-      detail: 'GitHub App authenticated (Token permissions: PR write, commit read).',
+      status: 'dry_run',
+      detail: 'Dry run - pull requests are previewed, not created',
     },
     {
       name: 'slack',
-      status: 'live',
-      detail: 'Incoming Webhook configured for channel #drift-alerts.',
+      status: 'disabled',
+      detail: 'Not connected',
     },
     {
       name: 'sandbox',
       status: 'live',
-      detail: 'Docker socket connected; Python 3.11 isolation worker pool ready.',
+      detail: 'Simulated in demo mode',
     },
     {
       name: 'n8n',
-      status: 'dry_run',
-      detail: 'Workflow triggers operating in dry-run mode (telemetry captured).',
+      status: 'disabled',
+      detail: 'Coming in next phase',
     },
   ],
 };

@@ -1,8 +1,8 @@
-// Top application header bar displaying user identity, role, mock mode pill, and logout.
+// Top application header bar displaying user identity, role, MOCK DATA pill, and logout.
 // Placed at the top of the AppShell.
 
 import React from 'react';
-import { LogOut, User as UserIcon, ShieldAlert, Cpu } from 'lucide-react';
+import { LogOut, User as UserIcon, ShieldAlert } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
 import { config } from '@/config/env';
 import { Badge } from '@/components/ui/Badge';
@@ -27,13 +27,12 @@ export const TopBar: React.FC = () => {
       {/* Left side: Context badge */}
       <div className="flex items-center gap-3">
         {config.useMock ? (
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-forge-amber/15 border border-forge-amber/30 text-forge-amber-light text-xs font-mono font-medium shadow-sm">
-            <Cpu className="w-3.5 h-3.5 animate-pulse" />
-            <span>MOCK MODE ACTIVE</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-forge-amber" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forge-amber/15 border border-forge-amber/30 text-forge-amber-light text-xs font-mono font-bold tracking-wider shadow-sm">
+            <span>MOCK DATA</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-forge-amber animate-ping" />
           </div>
         ) : (
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-forge-green/15 border border-forge-green/30 text-forge-green-light text-xs font-mono font-medium">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forge-green/15 border border-forge-green/30 text-forge-green-light text-xs font-mono font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-forge-green" />
             <span>CONNECTED TO BACKEND</span>
           </div>
@@ -48,7 +47,7 @@ export const TopBar: React.FC = () => {
               <div className="w-8 h-8 rounded-full bg-forge-surface-elevated border border-forge-border flex items-center justify-center text-gray-300">
                 <UserIcon className="w-4 h-4" />
               </div>
-              <span className="font-medium text-gray-200">{user.email}</span>
+              <span className="font-semibold text-gray-200">{user.email}</span>
             </div>
 
             <Badge variant={roleVariant(user.role)} size="sm">
@@ -61,7 +60,7 @@ export const TopBar: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={logout}
-              className="text-gray-400 hover:text-red-400 gap-1.5"
+              className="text-gray-400 hover:text-red-400 gap-1.5 font-medium"
               title="Sign out of DriftSmith"
             >
               <LogOut className="w-4 h-4" />

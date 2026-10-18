@@ -50,17 +50,17 @@ export const LoginPage: React.FC = () => {
         {/* Brand Wordmark */}
         <div className="flex flex-col items-center text-center space-y-2">
           <DriftSmithLogo className="h-10 justify-center" />
-          <p className="text-xs text-gray-400 font-mono">
-            Autonomous Self-Healing Agent for Third-Party API Drift
+          <p className="text-xs text-gray-400 font-sans max-w-xs">
+            When an API changes without warning, DriftSmith fixes your code automatically, tests the fix, and asks you to approve.
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="rounded-xl border border-forge-border bg-forge-surface p-8 shadow-2xl space-y-6">
+        <div className="rounded-2xl border border-forge-border bg-forge-surface p-8 shadow-2xl space-y-6">
           <div className="border-b border-forge-border/80 pb-4">
             <h1 className="text-lg font-bold text-white tracking-tight">Sign In to DriftSmith</h1>
             <p className="text-xs text-gray-400 mt-1">
-              Enter your authorized credentials to access the remediation cockpit.
+              Select a demo role below to explore the prototype.
             </p>
           </div>
 
@@ -123,9 +123,9 @@ export const LoginPage: React.FC = () => {
           {config.useMock && (
             <div className="pt-4 border-t border-forge-border space-y-2.5">
               <div className="flex items-center justify-between text-[11px] font-mono text-gray-400">
-                <span className="flex items-center gap-1 text-forge-amber-light">
+                <span className="flex items-center gap-1 text-forge-amber-light font-semibold">
                   <Key className="w-3.5 h-3.5" />
-                  Mock Mode Credentials (Password: demo1234)
+                  Demo Roles (Password: demo1234)
                 </span>
               </div>
 
@@ -133,37 +133,37 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setDemoUser('approver@demo.local')}
-                  className="p-2 rounded bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
+                  className="p-2.5 rounded-lg bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
                 >
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-semibold text-forge-green-light">
-                    <UserCheck className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-forge-green-light">
+                    <UserCheck className="w-3.5 h-3.5" />
                     Approver
                   </div>
-                  <div className="text-[10px] text-gray-400 truncate">approver@...</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Can approve</div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setDemoUser('admin@demo.local')}
-                  className="p-2 rounded bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
+                  className="p-2.5 rounded-lg bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
                 >
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-semibold text-forge-amber-light">
-                    <UserCheck className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-forge-amber-light">
+                    <UserCheck className="w-3.5 h-3.5" />
                     Admin
                   </div>
-                  <div className="text-[10px] text-gray-400 truncate">admin@...</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Full access</div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setDemoUser('viewer@demo.local')}
-                  className="p-2 rounded bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
+                  className="p-2.5 rounded-lg bg-forge-surface-elevated hover:bg-forge-amber/15 border border-forge-border hover:border-forge-amber/40 text-left transition-colors"
                 >
-                  <div className="flex items-center gap-1 text-[11px] font-mono font-semibold text-forge-cyan-light">
-                    <UserCheck className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-forge-cyan-light">
+                    <UserCheck className="w-3.5 h-3.5" />
                     Viewer
                   </div>
-                  <div className="text-[10px] text-gray-400 truncate">viewer@...</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Read-only</div>
                 </button>
               </div>
             </div>

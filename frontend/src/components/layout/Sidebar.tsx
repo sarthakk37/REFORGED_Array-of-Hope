@@ -1,9 +1,9 @@
 // Sidebar navigation for DriftSmith with custom hand-crafted Anvil/Spark logo.
-// Renders active page links and status markers for the application.
+// Features four clean navigation items: Demo, History, Remembered Fixes, and System Status.
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, BrainCircuit, Activity } from 'lucide-react';
+import { PlayCircle, History, Brain, Activity } from 'lucide-react';
 import { cn } from '@/lib/classNames';
 
 export const DriftSmithLogo: React.FC<{ className?: string }> = ({ className = 'h-8' }) => {
@@ -21,11 +21,8 @@ export const DriftSmithLogo: React.FC<{ className?: string }> = ({ className = '
           fill="currentColor"
         />
         {/* Anvil Horn */}
-        <path
-          d="M26 14H30C30 14 30 17 26 18V14Z"
-          fill="#d97706"
-        />
-        {/* Molten Sparks Flying */}
+        <path d="M26 14H30C30 14 30 17 26 18V14Z" fill="#d97706" />
+        {/* Molten Sparks */}
         <path
           d="M16 3L17.5 7L21 8.5L17.5 10L16 14L14.5 10L11 8.5L14.5 7L16 3Z"
           fill="#fbbf24"
@@ -39,7 +36,7 @@ export const DriftSmithLogo: React.FC<{ className?: string }> = ({ className = '
           Drift<span className="text-forge-amber">Smith</span>
         </span>
         <span className="text-[10px] tracking-widest uppercase font-mono text-gray-400">
-          Self-Healing API Agent
+          Self-Healing Code
         </span>
       </div>
     </div>
@@ -50,13 +47,18 @@ export const Sidebar: React.FC = () => {
   const navItems = [
     {
       to: '/',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
+      label: 'Demo',
+      icon: PlayCircle,
     },
     {
-      to: '/patterns',
-      label: 'Learned Patterns',
-      icon: BrainCircuit,
+      to: '/history',
+      label: 'History',
+      icon: History,
+    },
+    {
+      to: '/fixes',
+      label: 'Remembered Fixes',
+      icon: Brain,
     },
     {
       to: '/status',
@@ -75,9 +77,9 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
         <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500 font-mono">
-          Platform
+          Menu
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -88,9 +90,9 @@ export const Sidebar: React.FC = () => {
               end={item.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group',
+                  'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all group',
                   isActive
-                    ? 'bg-forge-amber/15 text-forge-amber-light border border-forge-amber/30 shadow-sm'
+                    ? 'bg-forge-amber/15 text-forge-amber-light border border-forge-amber/30 shadow-sm font-semibold'
                     : 'text-gray-400 hover:text-gray-100 hover:bg-forge-surface-elevated'
                 )
               }
@@ -112,13 +114,10 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer Info */}
-      <div className="p-4 border-t border-forge-border bg-black/20 text-xs text-gray-500 flex flex-col gap-1">
+      <div className="p-4 border-t border-forge-border bg-black/20 text-xs text-gray-400 flex flex-col gap-1">
         <div className="flex items-center justify-between text-[11px] font-mono">
-          <span>Engine: v0.9.4-hackathon</span>
-          <span className="flex items-center gap-1 text-forge-green">
-            <span className="w-1.5 h-1.5 rounded-full bg-forge-green animate-ping" />
-            Ready
-          </span>
+          <span>DriftSmith Prototype</span>
+          <span className="text-forge-green font-medium">Ready</span>
         </div>
         <p className="text-[11px] text-gray-500">Autonomous API Drift Remediation</p>
       </div>

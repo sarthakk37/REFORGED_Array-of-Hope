@@ -1,17 +1,17 @@
-// Unit tests for ApprovalBar component checking approver vs viewer role behavior.
-// Verifies approval buttons, confirmation dialogs, and read-only states.
+// Unit tests for ApprovalPanel component checking approver vs viewer role behavior and PR preview.
+// Verifies approval buttons, 3-bullet confirmation dialog, read-only state, and zero-network PR preview card.
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ApprovalBar } from '@/components/runs/ApprovalBar';
+import { ApprovalPanel } from '@/components/runs/ApprovalPanel';
 import * as AuthContextModule from '@/auth/AuthContext';
 import { RunDetail } from '@/api/types';
 
-describe('components/runs/ApprovalBar', () => {
+describe('components/runs/ApprovalPanel', () => {
   const mockRun: RunDetail = {
     id: 'run-999',
     scenario: 'type',
-    service_name: 'payment-gateway',
+    service_name: 'Payment app',
     source: 'manual',
     status: 'awaiting_approval',
     confidence: 0.96,
@@ -25,13 +25,13 @@ describe('components/runs/ApprovalBar', () => {
     patch: null,
     pull_request: {
       url: null,
-      branch: 'fix/drift-amount-type',
+      branch: 'driftsmith/fix-run-999',
       status: 'dry_run',
       dry_run: true,
     },
   };
 
-  it('renders Approve button for approver role and triggers confirmation modal', async () => {
+  it('renders Approve button for approver role and triggers 3-bullet confirmation modal', async () => {
     vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
       user: { id: 'usr-app', email: 'approver@demo.local', role: 'approver' },
       isLoading: false,
@@ -42,17 +42,18 @@ describe('components/runs/ApprovalBar', () => {
 
     const mockApprove = vi.fn().mockResolvedValue(undefined);
 
-    render(<ApprovalBar run={mockRun} onApprove={mockApprove} isApproving={false} />);
+    render(<ApprovalPanel run={mockRun} onApprove={mockApprove} isApproving={false} />);
 
-    const approveBtn = screen.getByRole('button', { name: /approve & open pr/i });
+    const approveBtn = screen.getByRole('button', { name: /approve and open pull request/i });
     expect(approveBtn).toBeInTheDocument();
 
     // Click opens confirmation modal
     fireEvent.click(approveBtn);
-    expect(screen.getByText(/approve patch & open pull request/i)).toBeInTheDocument();
+    expect(screen.getByText(/approve fix and open pull request/i)).toBeInTheDocument();
+    expect(screen.getByText(/approves the code change verified in the safe test room/i)).toBeInTheDocument();
 
     // Confirm button in modal triggers onApprove
-    const confirmBtn = screen.getByRole('button', { name: /confirm & open pr/i });
+    const confirmBtn = screen.getByRole('button', { name: /^approve fix$/i });
     fireEvent.click(confirmBtn);
     expect(mockApprove).toHaveBeenCalledTimes(1);
   });
@@ -68,13 +69,13 @@ describe('components/runs/ApprovalBar', () => {
 
     const mockApprove = vi.fn();
 
-    render(<ApprovalBar run={mockRun} onApprove={mockApprove} isApproving={false} />);
+    render(<ApprovalPanel run={mockRun} onApprove={mockApprove} isApproving={false} />);
 
-    expect(screen.queryByRole('button', { name: /approve & open pr/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId('viewer-readonly-badge')).toHaveTextContent(/read-only: approver role required/i);
+    expect(screen.queryByRole('button', { name: /approve and open pull request/i })).not.toBeInTheDocument();
+    expect(screen.getByTestId('viewer-readonly-badge')).toHaveTextContent(/you have read-only access/i);
   });
 
-  it('displays approved state when status is approved', () => {
+  it('displays PR preview card when status is approved without making network calls', () => {
     vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
       user: { id: 'usr-app', email: 'approver@demo.local', role: 'approver' },
       isLoading: false,
@@ -87,19 +88,18 @@ describe('components/runs/ApprovalBar', () => {
       ...mockRun,
       status: 'approved',
       pull_request: {
-        url: 'https://github.com/driftsmith-demo/payment-gateway/pull/104',
-        branch: 'fix/drift-amount-type',
-        status: 'open',
-        dry_run: false,
+        url: null,
+        branch: 'driftsmith/fix-run-999',
+        status: 'dry_run',
+        dry_run: true,
       },
     };
 
-    render(<ApprovalBar run={approvedRun} onApprove={vi.fn()} isApproving={false} />);
+    render(<ApprovalPanel run={approvedRun} onApprove={vi.fn()} isApproving={false} />);
 
-    expect(screen.getByText(/approved & open/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /view github pr/i })).toHaveAttribute(
-      'href',
-      'https://github.com/driftsmith-demo/payment-gateway/pull/104'
-    );
+    expect(screen.getByTestId('pr-preview-card')).toBeInTheDocument();
+    expect(screen.getByText(/preview - real github prs are enabled in the next phase/i)).toBeInTheDocument();
+    expect(screen.getByText(/driftsmith\/fix-run-999/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /copy pr description/i })).toBeInTheDocument();
   });
 });
