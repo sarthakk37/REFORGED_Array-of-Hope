@@ -27,7 +27,15 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
 }) => {
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       className={cn(
         'p-5 rounded-xl border text-left cursor-pointer transition-all duration-200 relative group flex flex-col justify-between space-y-4',
         isSelected

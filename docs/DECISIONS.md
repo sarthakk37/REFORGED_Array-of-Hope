@@ -64,3 +64,12 @@ This document tracks technical decisions made during the development of DriftSmi
 ### DEC-011: Honest Subsystem Observability without Fabricated Production Claims
 - **Context:** Hardcoded claims like "PostgreSQL 12 active connections" or "Anthropic Claude" misrepresented the prototype architecture.
 - **Decision:** Derive all subsystem states truthfully from mock health data: SQLite (demo), Gemma via Gemini API (mock mode), GitHub (dry run preview), Slack (not connected), Safe test room (simulated in demo mode).
+
+### DEC-012: Codebase Modularity & Dead-Weight Removal (Phase 1)
+- **Context:** Following rapid prototype iterations, redundant components, obsolete pages, and monolithic files >400 lines accrued.
+- **Decision:**
+  1. Detect and remove dead components (`AgentTimeline`, `ApprovalBar`, `DiffViewer`, `DriftReportCard`, `LearnedPatternsPage`, `Tabs`, `formatDuration`, etc.) using `knip`.
+  2. Enforce a strict 200-line ceiling per file with one component per file by splitting monolithic modules (`DashboardPage` into `SimulatorHeader`, `SimulatorControls`, `RecentRunsTable`; `ApprovalPanel` into `PullRequestPreviewCard`, `ApprovalConfirmModal`; mock scenarios and events into individual typed files).
+  3. Add comprehensive smoke test coverage (`src/test/smoke.test.tsx`) asserting all 5 primary flows (login, simulation trigger, detail inspection, approval & PR preview, presenter mode).
+  4. Enforce ESLint rules (`no-console` with error/warn allowance, `max-lines` 200, strict type safety) and add unified `npm run check`.
+

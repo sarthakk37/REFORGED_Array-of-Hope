@@ -61,16 +61,3 @@ export const CardContent = React.forwardRef<
   </div>
 ));
 CardContent.displayName = 'CardContent';
-
-export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children,
-  className,
-  ...props
-}) => (
-  <div
-    className={cn('px-5 py-3 border-t border-forge-border bg-black/20 flex items-center', className)}
-    {...props}
-  >
-    {children}
-  </div>
-);

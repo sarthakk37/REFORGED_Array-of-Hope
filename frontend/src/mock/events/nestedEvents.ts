@@ -1,0 +1,91 @@
+// Event sequence for Email moved (object restructure).
+// Simulates navigating restructured customer email payload and verifying fallback.
+
+import { EventStepTemplate } from './types';
+
+export const nestedEvents: EventStepTemplate[] = [
+  {
+    agent: 'system',
+    friendlyRole: 'Coordinator',
+    kind: 'info',
+    message: '1. API changed: Payment provider updated payload customer structure.',
+    delayMs: 600,
+    storyStep: 1,
+  },
+  {
+    agent: 'sentinel',
+    friendlyRole: 'Detector',
+    kind: 'thought',
+    message: 'Detector is inspecting the nested payload...',
+    delayMs: 1400,
+    storyStep: 1,
+  },
+  {
+    agent: 'sentinel',
+    friendlyRole: 'Detector',
+    kind: 'success',
+    message: '2. Problem found: Email field was moved from customer.email to payer.contact.email.',
+    delayMs: 1600,
+    storyStep: 2,
+    technicalDetails: { from: 'customer.email', to: 'payer.contact.email', confidence: 0.94 },
+  },
+  {
+    agent: 'triage',
+    friendlyRole: 'Investigator',
+    kind: 'thought',
+    message: 'Investigator diagnosed: customer.email was relocated to payer.contact.email.',
+    delayMs: 1600,
+    storyStep: 2,
+    technicalDetails: { from: 'customer.email', to: 'payer.contact.email', confidence: 0.94 },
+  },
+  {
+    agent: 'locator',
+    friendlyRole: 'Code writer',
+    kind: 'action',
+    message: 'Code writer located customer receipt helper in services/payment_webhook.py:42.',
+    delayMs: 1600,
+    storyStep: 3,
+  },
+  {
+    agent: 'coder',
+    friendlyRole: 'Code writer',
+    kind: 'thought',
+    message: '3. Fix written: Code updated to check payer.contact.email first, with fallback to customer.email.',
+    delayMs: 2000,
+    storyStep: 3,
+  },
+  {
+    agent: 'verifier',
+    friendlyRole: 'Tester',
+    kind: 'action',
+    message: '4. Fix tested: Running tests in safe test room...',
+    delayMs: 1800,
+    storyStep: 4,
+  },
+  {
+    agent: 'verifier',
+    friendlyRole: 'Tester',
+    kind: 'success',
+    message: 'Tests passed! Works with both the OLD data (22ms) and the NEW data (26ms).',
+    delayMs: 2000,
+    storyStep: 4,
+    technicalDetails: { old_data_test: 'passed', new_data_test: 'passed' },
+  },
+  {
+    agent: 'pr',
+    friendlyRole: 'Reporter',
+    kind: 'action',
+    message: '5. Ready for your approval: Created a proposed pull request preview for your team.',
+    delayMs: 1800,
+    storyStep: 5,
+    technicalDetails: { branch: 'driftsmith/fix-moved-email-payment-app', preview: true },
+  },
+  {
+    agent: 'system',
+    friendlyRole: 'Coordinator',
+    kind: 'info',
+    message: 'run_finished',
+    delayMs: 800,
+    storyStep: 5,
+  },
+];

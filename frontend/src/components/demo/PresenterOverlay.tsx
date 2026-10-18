@@ -81,7 +81,10 @@ export const PresenterOverlay: React.FC<PresenterOverlayProps> = ({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6 bg-gradient-to-t from-black via-black/95 to-transparent pointer-events-none">
-      <div className="max-w-4xl mx-auto rounded-2xl border-2 border-forge-amber/60 bg-forge-surface/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl pointer-events-auto space-y-5">
+      <div
+        data-testid="presenter-overlay"
+        className="max-w-4xl mx-auto rounded-2xl border-2 border-forge-amber/60 bg-forge-surface/95 backdrop-blur-xl p-6 sm:p-7 shadow-2xl pointer-events-auto space-y-5"
+      >
         {/* Top Control Bar */}
         <div className="flex items-center justify-between gap-4 border-b border-forge-border/80 pb-3">
           <div className="flex items-center gap-2.5">

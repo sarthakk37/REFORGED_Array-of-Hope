@@ -2,7 +2,8 @@
 // Verifies input validation, credential dispatch, and error alert presentation.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { LoginPage } from '@/pages/LoginPage';
 import * as AuthContextModule from '@/auth/AuthContext';
@@ -34,6 +35,7 @@ describe('pages/LoginPage', () => {
   });
 
   it('submits credentials through auth context on submit', async () => {
+    const user = userEvent.setup();
     mockLogin.mockResolvedValueOnce(undefined);
 
     render(
@@ -43,7 +45,7 @@ describe('pages/LoginPage', () => {
     );
 
     const submitBtn = screen.getByRole('button', { name: /sign in/i });
-    fireEvent.click(submitBtn);
+    await user.click(submitBtn);
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith({
@@ -54,6 +56,7 @@ describe('pages/LoginPage', () => {
   });
 
   it('displays error alert when login fails', async () => {
+    const user = userEvent.setup();
     mockLogin.mockRejectedValueOnce(new Error('Invalid email or password'));
 
     render(
@@ -63,7 +66,7 @@ describe('pages/LoginPage', () => {
     );
 
     const submitBtn = screen.getByRole('button', { name: /sign in/i });
-    fireEvent.click(submitBtn);
+    await user.click(submitBtn);
 
     await waitFor(() => {
       expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();

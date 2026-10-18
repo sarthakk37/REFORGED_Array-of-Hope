@@ -1,0 +1,91 @@
+// Event sequence for Field renamed (key rename).
+// Simulates autonomous investigation, patch generation, and dual-compatibility testing.
+
+import { EventStepTemplate } from './types';
+
+export const renameEvents: EventStepTemplate[] = [
+  {
+    agent: 'system',
+    friendlyRole: 'Coordinator',
+    kind: 'info',
+    message: '1. API changed: Payment provider sent updated payment payload.',
+    delayMs: 600,
+    storyStep: 1,
+  },
+  {
+    agent: 'sentinel',
+    friendlyRole: 'Detector',
+    kind: 'thought',
+    message: 'Detector is inspecting the failing payload...',
+    delayMs: 1400,
+    storyStep: 1,
+  },
+  {
+    agent: 'sentinel',
+    friendlyRole: 'Detector',
+    kind: 'success',
+    message: '2. Problem found: Field amount_in_cents was renamed to total_amount.',
+    delayMs: 1600,
+    storyStep: 2,
+    technicalDetails: { from: 'amount_in_cents', to: 'total_amount', confidence: 0.98 },
+  },
+  {
+    agent: 'triage',
+    friendlyRole: 'Investigator',
+    kind: 'thought',
+    message: 'Investigator diagnosed: your app expects amount_in_cents, but the provider now sends total_amount.',
+    delayMs: 1600,
+    storyStep: 2,
+    technicalDetails: { from: 'amount_in_cents', to: 'total_amount', confidence: 0.98 },
+  },
+  {
+    agent: 'locator',
+    friendlyRole: 'Code writer',
+    kind: 'action',
+    message: 'Code writer located handler at services/payment_webhook.py:17.',
+    delayMs: 1600,
+    storyStep: 3,
+  },
+  {
+    agent: 'coder',
+    friendlyRole: 'Code writer',
+    kind: 'thought',
+    message: '3. Fix written: Code updated to read total_amount while still accepting amount_in_cents.',
+    delayMs: 2000,
+    storyStep: 3,
+  },
+  {
+    agent: 'verifier',
+    friendlyRole: 'Tester',
+    kind: 'action',
+    message: '4. Fix tested: Running tests in safe test room...',
+    delayMs: 1800,
+    storyStep: 4,
+  },
+  {
+    agent: 'verifier',
+    friendlyRole: 'Tester',
+    kind: 'success',
+    message: 'Tests passed! Works with both the OLD data (24ms) and the NEW data (28ms).',
+    delayMs: 2200,
+    storyStep: 4,
+    technicalDetails: { old_data_test: 'passed', new_data_test: 'passed' },
+  },
+  {
+    agent: 'pr',
+    friendlyRole: 'Reporter',
+    kind: 'action',
+    message: '5. Ready for your approval: Created a proposed pull request preview for your team.',
+    delayMs: 1800,
+    storyStep: 5,
+    technicalDetails: { branch: 'driftsmith/fix-renamed-field-payment-app', preview: true },
+  },
+  {
+    agent: 'system',
+    friendlyRole: 'Coordinator',
+    kind: 'info',
+    message: 'run_finished',
+    delayMs: 800,
+    storyStep: 5,
+  },
+];
