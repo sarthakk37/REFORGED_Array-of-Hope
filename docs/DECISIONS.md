@@ -58,7 +58,7 @@ This document tracks technical decisions made during the development of DriftSmi
 - **Decision:** In mock mode, approval never invokes the network or GitHub. It renders an inline "Pull request preview" card with branch `driftsmith/fix-<id>`, copyable description, and clear preview label. Disable buttons during inflight requests to prevent double submits.
 
 ### DEC-011: Honest Subsystem Observability without Fabricated Production Claims
-- **Context:** Hardcoded claims like "PostgreSQL 12 active connections" or "Anthropic Claude" misrepresented the prototype architecture.
+- **Context:** Hardcoded claims like "PostgreSQL 12 active connections" or external cloud clusters misrepresented the prototype architecture.
 - **Decision:** Derive all subsystem states truthfully from mock health data: SQLite (demo), Gemma via Gemini API (mock mode), GitHub (dry run preview), Slack (not connected), Safe test room (simulated in demo mode).
 
 ### DEC-012: Codebase Modularity & Dead-Weight Removal (Phase 1)
